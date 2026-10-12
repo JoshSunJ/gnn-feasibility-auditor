@@ -4,13 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gnn-feasibility-auditor"
-version = "0.1.0"
+version = "0.2.0"
 description = "Exact feature-aware 1-WL training feasibility audit"
 requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
 benchmark = ["torch>=2.2"]
+service = ["fastapi==0.143.0", "uvicorn==0.54.0", "psutil==7.2.2"]
+test = ["httpx==0.28.1", "pytest==9.1.1", "hypothesis==6.169.0"]
+pyg = ["torch>=2.2", "torch-geometric>=2.5"]
 
 [project.scripts]
 gnn-audit = "gnn_auditor.cli:main"
@@ -20,3 +23,4 @@ include = ["gnn_auditor*"]
 
 [tool.setuptools.package-data]
 gnn_auditor = ["explorer.html"]
+"gnn_auditor.service" = ["demo.json"]
