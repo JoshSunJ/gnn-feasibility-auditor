@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "split": "train",
+  "graph_type": "simple_undirected",
+  "feature_dtype": "float64",
+  "feature_dim": 1,
+  "graphs": [
+    {
+      "id": "cycle-6",
+      "label": "connected",
+      "nodes": [
+        {
+          "id": "0",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "1",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "2",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "3",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "4",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "5",
+          "features": [
+            1.0
+          ]
+        }
+      ],
+      "edges": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "2"
+        ],
+        [
+          "2",
+          "3"
+        ],
+        [
+          "3",
+          "4"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "5",
+          "0"
+        ]
+      ],
+      "description": "Connected 6-cycle; every node has actual input [1]."
+    },
+    {
+      "id": "cycle-6-copy",
+      "label": "connected",
+      "nodes": [
+        {
+          "id": "0",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "1",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "2",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "3",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "4",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "5",
+          "features": [
+            1.0
+          ]
+        }
+      ],
+      "edges": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "2"
+        ],
+        [
+          "2",
+          "3"
+        ],
+        [
+          "3",
+          "4"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "5",
+          "0"
+        ]
+      ],
+      "description": "A duplicate training sample: counts again in micro accuracy."
+    },
+    {
+      "id": "two-triangles",
+      "label": "disconnected",
+      "nodes": [
+        {
+          "id": "0",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "1",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "2",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "3",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "4",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "5",
+          "features": [
+            1.0
+          ]
+        }
+      ],
+      "edges": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "2"
+        ],
+        [
+          "2",
+          "0"
+        ],
+        [
+          "3",
+          "4"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "5",
+          "3"
+        ]
+      ],
+      "description": "Two disconnected triangles; every node has actual input [1]."
+    },
+    {
+      "id": "path-6",
+      "label": "connected",
+      "nodes": [
+        {
+          "id": "0",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "1",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "2",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "3",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "4",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "5",
+          "features": [
+            1.0
+          ]
+        }
+      ],
+      "edges": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "2"
+        ],
+        [
+          "2",
+          "3"
+        ],
+        [
+          "3",
+          "4"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "description": "Connected path: separated by degree refinement."
+    },
+    {
+      "id": "marked-triangles",
+      "label": "disconnected",
+      "nodes": [
+        {
+          "id": "0",
+          "features": [
+            2.0
+          ]
+        },
+        {
+          "id": "1",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "2",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "3",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "4",
+          "features": [
+            1.0
+          ]
+        },
+        {
+          "id": "5",
+          "features": [
+            1.0
+          ]
+        }
+      ],
+      "edges": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "2"
+        ],
+        [
+          "2",
+          "0"
+        ],
+        [
+          "3",
+          "4"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "5",
+          "3"
+        ]
+      ],
+      "description": "Two triangles with one actual input [2]; others [1]."
+    }
+  ],
+  "description": "Synthetic correctness fixture, not a real benchmark dataset. C6 and two triangles have identical actual features; a marked feature changes the result."
+}

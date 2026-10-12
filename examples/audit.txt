@@ -1,0 +1,22 @@
+GNN Feasibility Auditor — exact feature-aware 1-WL
+Training accuracy upper bound: 4/5 = 80.00%
+Unavoidable training errors: 1
+Graphs: 5 | WL classes: 3 | Stable at round: 4
+Features: 1D float64 (exact represented values)
+Indistinguishable pairs: 3 | Cross-label pairs: 2
+
+Conflicting equivalence classes:
+  C1: cycle-6, cycle-6-copy, two-triangles
+    Labels: 'connected' (string): 2, 'disconnected' (string): 1; at most 2/3 correct
+
+Concrete cross-label witnesses:
+  cycle-6 ('connected') <-> two-triangles ('disconnected') [C1]
+    Matching exact color histograms in rounds 0, 1, 2, 3, 4
+  cycle-6-copy ('connected') <-> two-triangles ('disconnected') [C1]
+    Matching exact color histograms in rounds 0, 1, 2, 3, 4
+
+This is an upper bound on micro accuracy for the supplied training multiset, not a prediction of test accuracy.
+Applies to deterministic shared message passing and invariant multiset readout using only the supplied topology and actual features.
+Matching complete stable color histograms proves 1-WL indistinguishability, not graph isomorphism. No graph hash is used as proof.
+A particular architecture, depth or optimizer can perform below this ceiling. A 100% ceiling is inconclusive.
+Export all actual model inputs after preprocessing in the declared precision; extra inputs, stochastic evaluation or numerical artifacts can invalidate the model comparison.

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gnn-feasibility-auditor"
+version = "0.1.0"
+description = "Exact feature-aware 1-WL training feasibility audit"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+benchmark = ["torch>=2.2"]
+
+[project.scripts]
+gnn-audit = "gnn_auditor.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["gnn_auditor*"]
+
+[tool.setuptools.package-data]
+gnn_auditor = ["explorer.html"]
