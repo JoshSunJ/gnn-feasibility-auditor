@@ -6,6 +6,10 @@ The core needs only Python 3.10+. The service uses Python 3.13, FastAPI and supe
 
 Private project: [repository](https://github.com/JoshSunJ/gnn-feasibility-auditor), [release tracker](https://github.com/JoshSunJ/gnn-feasibility-auditor/issues/1), [release checks](https://github.com/JoshSunJ/gnn-feasibility-auditor/actions). Public hosting remains on hold until release/staging gates pass. The application has no real-data ML study yet; saved model fits use the synthetic correctness fixture.
 
+![Verified audit and graph inspection](docs/screenshots/audit-desktop.png)
+
+Completed evidence: 40 Python tests, four frontend component tests, four Linux desktop/mobile browser workflows, installed CLI smoke checks and actual Docker HTTP checks. Detailed provenance and limitations are in VERIFICATION.md.
+
 Read [RESEARCH.md](RESEARCH.md) for the mathematical claim, assumptions, data format, proof sketch, primary references and correctness criteria. Read [VERIFICATION.md](VERIFICATION.md) for the acceptance gate and measured results. The core passed before benchmarks or the interface were implemented.
 
 ## Start here
