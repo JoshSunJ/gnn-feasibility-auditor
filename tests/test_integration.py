@@ -7,6 +7,8 @@ import unittest
 
 from gnn_auditor.data import dataset_object, load_dataset, parse_dataset
 from gnn_auditor.explorer import render_html
+from gnn_auditor.explorer import render_verified_html
+from gnn_auditor.partition import audit_partition
 from gnn_auditor.verify import verify_report
 from test_core import dataset, graph
 
@@ -14,6 +16,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ExplorerTests(unittest.TestCase):
+    def test_compact_export_keeps_full_exact_proof_in_download_and_final_only_view(self):
+        data = parse_dataset(dataset(graph("a", 3, [(0, 1), (1, 2)], 2 ** 60), graph("b", 3, [(0, 1), (1, 2)], 2 ** 60 + 1)))
+        report = audit_partition(data, include_certificate=True)
+        html = render_verified_html(data, report)
+        value = json.loads(re.search(r'<script id="audit-data" type="application/json">(.*?)</script>', html, re.S).group(1))
+        self.assertEqual(value["inspection"]["mode"], "stable_only")
+        self.assertNotIn("events", value["report"]["certificate"])
+        verify_report(data, json.loads(value["report_json"]))
+        self.assertEqual(json.loads(value["dataset_json"]), dataset_object(data))
+        self.assertNotEqual(value["graph_label_text"]["a"], value["graph_label_text"]["b"])
+
     def test_export_embeds_verified_input_and_certificate(self):
         data = load_dataset(ROOT / "examples/conflicts.json")
         html = render_html(data)

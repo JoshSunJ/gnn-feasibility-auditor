@@ -1,13 +1,15 @@
 """Same-origin HTTP interface. Upload text goes unchanged to the strict loader."""
 
 from contextlib import asynccontextmanager
+import asyncio
 from pathlib import Path
 from typing import Literal
 
 import anyio
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, StreamingResponse
+from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -16,7 +18,8 @@ from .limits import Limits
 
 
 class Progress(BaseModel):
-    round: int
+    round: int | None = None
+    step: int | None = None
     color_count: int
 
 
@@ -40,10 +43,11 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
     @asynccontextmanager
     async def lifespan(app):
         app.state.jobs = manager_factory(limits)
+        app.state.uploads = asyncio.Semaphore(2)
         yield
         app.state.jobs.close()
 
-    app = FastAPI(title="GNN Feasibility Auditor", version="0.2.0", lifespan=lifespan,
+    app = FastAPI(title="GNN Feasibility Auditor", version="0.3.0", lifespan=lifespan,
                   description="Exact actual-feature 1-WL auditing of supplied training graphs. Completed results are independently replayed; interrupted jobs have no certified ceiling.")
 
     @app.middleware("http")
@@ -66,7 +70,7 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
 
     @app.get("/api/config")
     def config():
-        return {"limits": limits.public(), "scope": "simple undirected training graphs with explicit numeric float32/float64 node features", "storage": "Temporary; results expire and are lost on service restart.", "version": "0.2.0"}
+        return {"limits": limits.public(), "scope": "simple undirected training graphs with explicit numeric float32/float64 node features", "storage": "Temporary; results expire and are lost on service restart.", "version": "0.3.0"}
 
     @app.get("/api/demo")
     def demo():
@@ -75,7 +79,7 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
 
     @app.post("/api/jobs", status_code=202, response_model=JobView,
               openapi_extra={"requestBody": {"required": True, "content": {"application/json": {"schema": {"type": "object", "description": "Original training dataset JSON; the worker's strict loader validates the documented schema without coercing model inputs."}}}}})
-    async def submit(request: Request):
+    async def submit(request: Request, mode: Literal["auto", "trace", "partition"] = "auto"):
         if request.headers.get("content-type", "").split(";", 1)[0].strip() != "application/json":
             raise HTTPException(415, "Send the original dataset JSON with Content-Type: application/json.")
         length = request.headers.get("content-length")
@@ -85,23 +89,26 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
                     raise HTTPException(413, "Dataset exceeds this service's upload byte limit.")
             except ValueError:
                 raise HTTPException(400, "Invalid Content-Length.")
-        body = bytearray()
-        try:
-            with anyio.fail_after(10):
-                async for chunk in request.stream():
-                    body.extend(chunk)
-                    if len(body) > limits.max_bytes:
-                        raise HTTPException(413, "Dataset exceeds this service's upload byte limit.")
-        except TimeoutError:
-            raise HTTPException(408, "Upload took too long. Retry with a smaller file.")
-        try:
-            raw = body.decode("utf-8")
-        except UnicodeError:
-            raise HTTPException(400, "Dataset must be UTF-8 JSON.")
-        try:
-            return app.state.jobs.submit(raw)
-        except CapacityError as error:
-            raise HTTPException(429, str(error), headers={"Retry-After": "10"})
+        if app.state.uploads.locked() or not app.state.jobs.can_submit():
+            raise HTTPException(429, "Audit/upload capacity is full. Retry after current work finishes or results expire.", headers={"Retry-After": "10"})
+        async with app.state.uploads:
+            body = bytearray()
+            try:
+                with anyio.fail_after(10):
+                    async for chunk in request.stream():
+                        body.extend(chunk)
+                        if len(body) > limits.max_bytes:
+                            raise HTTPException(413, "Dataset exceeds this service's upload byte limit.")
+            except TimeoutError:
+                raise HTTPException(408, "Upload took too long. Retry with a smaller file.")
+            try:
+                raw = body.decode("utf-8")
+            except UnicodeError:
+                raise HTTPException(400, "Dataset must be UTF-8 JSON.")
+            try:
+                return app.state.jobs.submit(raw, mode)
+            except CapacityError as error:
+                raise HTTPException(429, str(error), headers={"Retry-After": "10"})
 
     def lookup(action, *args):
         try:
@@ -123,11 +130,17 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
     def download(job_id: str, artifact: str):
         if artifact not in {"report", "inputs", "explorer", "view"}:
             raise HTTPException(404, "Unknown artifact.")
-        content = lookup(app.state.jobs.artifact, job_id, artifact)
-        if artifact == "explorer":
-            return Response(content, media_type="text/html")
+        stream = lookup(app.state.jobs.open_artifact, job_id, artifact)
+        def chunks():
+            try:
+                while block := stream.read(65_536):
+                    yield block
+            finally:
+                stream.close()
         headers = {} if artifact == "view" else {"Content-Disposition": f'attachment; filename="{artifact}.json"'}
-        return Response(content, media_type="application/json", headers=headers)
+        if artifact == "explorer":
+            headers = {}
+        return StreamingResponse(chunks(), media_type="text/html" if artifact == "explorer" else "application/json", headers=headers, background=BackgroundTask(stream.close))
 
     if frontend.is_dir():
         app.mount("/", StaticFiles(directory=frontend, html=True), name="frontend")

@@ -23,6 +23,10 @@ def _freeze(value: Any) -> Any:
 
 def verify_report(dataset: Dataset, report: dict) -> None:
     """Validate a report against the given actual inputs, or raise VerificationError."""
+    if isinstance(report, dict) and report.get("report_version") == 2:
+        from .partition_verify import verify_partition_report
+        verify_partition_report(dataset, report)
+        return
     try:
         _verify(dataset, report)
     except VerificationError:

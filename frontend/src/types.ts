@@ -20,11 +20,16 @@ export interface Summary {
   unavoidable_training_errors: number;
   conflicting_pair_count: number;
   certificate_verified: boolean;
+  engine?: "trace" | "partition";
 }
 export interface Job {
   id: string;
   status: JobStatus;
-  progress: { round: number; color_count: number } | null;
+  progress: {
+    round: number | null;
+    step?: number | null;
+    color_count: number;
+  } | null;
   summary: Summary | null;
   error: { code: string; message: string } | null;
   expires_at: number | null;
@@ -52,7 +57,8 @@ export interface WLClass {
 }
 export interface View {
   dataset: { graphs: Graph[]; feature_dtype: string; feature_dim: number };
-  report: { classes: WLClass[]; certificate: { rounds: Round[] } };
+  report: { classes: WLClass[]; certificate: { rounds?: Round[] } };
+  inspection?: { mode: "rounds" | "stable_only"; rounds?: Round[] };
   graph_label_text: Record<string, string>;
   class_label_text: Record<string, string[]>;
 }

@@ -23,6 +23,7 @@ def parser() -> argparse.ArgumentParser:
     run = commands.add_parser("audit", help="compute training ceiling and cross-label witnesses")
     run.add_argument("dataset", type=Path)
     run.add_argument("--format", choices=["text", "json"], default="text")
+    run.add_argument("--engine", choices=["trace", "partition"], default="trace", help="full synchronous trace or compact exact partition certificate")
     run.add_argument("--max-pairs", type=_nonnegative, default=20)
     run.add_argument("--certificate", action="store_true", help="include replayable proof trace (JSON only)")
     run.add_argument("--output", type=Path, help="save report; otherwise print to stdout")
@@ -42,6 +43,7 @@ def parser() -> argparse.ArgumentParser:
     explore.add_argument("dataset", type=Path)
     explore.add_argument("--output", type=Path, required=True)
     explore.add_argument("--benchmark", type=Path, help="attach measured benchmark JSON")
+    explore.add_argument("--engine", choices=["trace", "partition"], default="trace")
     return root
 
 
@@ -53,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "verify":
             report = json.loads(args.report.read_text(encoding="utf-8"))
             verify_report(dataset, report)
-            print("Verified: exact 1-WL trace, stabilization, equivalence classes, witnesses and training ceiling.")
+            print("Verified: exact 1-WL evidence, stability, equivalence classes, witnesses and training ceiling.")
             return 0
         if args.command == "benchmark":
             from .benchmark import BenchmarkError, run_benchmarks
@@ -70,10 +72,14 @@ def main(argv: list[str] | None = None) -> int:
                 sys.stdout.write(output)
             return 0
         if args.command == "explore":
-            from .explorer import render_html
+            from .explorer import render_html, render_verified_html
             measured = json.loads(args.benchmark.read_text(encoding="utf-8")) if args.benchmark else None
             try:
-                output = render_html(dataset, measured)
+                if args.engine == "partition":
+                    from .partition import audit_partition
+                    output = render_verified_html(dataset, audit_partition(dataset, max_pairs=100, include_certificate=True), measured)
+                else:
+                    output = render_html(dataset, measured)
             except ValueError as error:
                 print(f"gnn-audit: {error}", file=sys.stderr)
                 return 2
@@ -82,7 +88,11 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.certificate and args.format != "json":
             root.error("--certificate requires --format json")
-        report = audit(dataset, args.max_pairs, args.certificate)
+        if args.engine == "partition":
+            from .partition import audit_partition
+            report = audit_partition(dataset, args.max_pairs, args.certificate)
+        else:
+            report = audit(dataset, args.max_pairs, args.certificate)
         output = json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + "\n" if args.format == "json" else text_report(report)
         if args.output:
             args.output.write_text(output, encoding="utf-8")

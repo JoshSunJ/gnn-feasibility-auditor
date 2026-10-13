@@ -1,0 +1,745 @@
+{
+  "kind": "isolated_service_scale_probe",
+  "environment": {
+    "python": "3.13.13",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O"
+  },
+  "limits": {
+    "max_bytes": 16777216,
+    "max_graphs": 2048,
+    "max_nodes": 50000,
+    "max_edges": 200000,
+    "max_feature_dim": 64,
+    "max_trace_cells": 131072,
+    "max_output_bytes": 67108864,
+    "max_moved_vertices": 500000,
+    "timeout_seconds": 20,
+    "memory_mb": 256,
+    "max_active": 1,
+    "max_queued": 3,
+    "max_retained": 8,
+    "ttl_seconds": 900
+  },
+  "repetitions": 3,
+  "cases": [
+    {
+      "case": "synthetic-path-512",
+      "kind": "synthetic",
+      "nodes": 512,
+      "input_bytes": 24417,
+      "mode": "partition",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 0.19035145797533914,
+          "worker_seconds": 0.16142245900118724,
+          "sampled_peak_mb": 27.42,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 512,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 22389,
+            "report": 34081,
+            "view": 35836,
+            "explorer": 133180
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.19058029097504914,
+          "worker_seconds": 0.15381124999839813,
+          "sampled_peak_mb": 27.78,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 512,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 22389,
+            "report": 34081,
+            "view": 35836,
+            "explorer": 133180
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.2147533750103321,
+          "worker_seconds": 0.1856393339985516,
+          "sampled_peak_mb": 27.55,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 512,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 22389,
+            "report": 34081,
+            "view": 35836,
+            "explorer": 133180
+          }
+        }
+      ],
+      "median_seconds": 0.19058029097504914,
+      "max_seconds": 0.2147533750103321,
+      "maximum_sampled_peak_mb": 27.78
+    },
+    {
+      "case": "synthetic-path-6000",
+      "kind": "synthetic",
+      "nodes": 6000,
+      "input_bytes": 302841,
+      "mode": "auto",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 0.3853139580169227,
+          "worker_seconds": 0.3518249170156196,
+          "sampled_peak_mb": 40.0,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 6000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 278861,
+            "report": 406063,
+            "view": 438029,
+            "explorer": 1331211
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.5256340420164634,
+          "worker_seconds": 0.48821862501790747,
+          "sampled_peak_mb": 43.67,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 6000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 278861,
+            "report": 406063,
+            "view": 438029,
+            "explorer": 1331211
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.3657979999843519,
+          "worker_seconds": 0.33711837499868125,
+          "sampled_peak_mb": 47.59,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 6000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 278861,
+            "report": 406063,
+            "view": 438029,
+            "explorer": 1331211
+          }
+        }
+      ],
+      "median_seconds": 0.3853139580169227,
+      "max_seconds": 0.5256340420164634,
+      "maximum_sampled_peak_mb": 47.59
+    },
+    {
+      "case": "synthetic-path-50000",
+      "kind": "synthetic",
+      "nodes": 50000,
+      "input_bytes": 2666841,
+      "mode": "auto",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 2.311532833002275,
+          "worker_seconds": 2.282615625008475,
+          "sampled_peak_mb": 189.47,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2466861,
+            "report": 3560069,
+            "view": 3941038,
+            "explorer": 11518226
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 2.31829879200086,
+          "worker_seconds": 2.2832275409891736,
+          "sampled_peak_mb": 189.5,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2466861,
+            "report": 3560069,
+            "view": 3941038,
+            "explorer": 11518226
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 2.284235333005199,
+          "worker_seconds": 2.2500863750174176,
+          "sampled_peak_mb": 189.17,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2466861,
+            "report": 3560069,
+            "view": 3941038,
+            "explorer": 11518226
+          }
+        }
+      ],
+      "median_seconds": 2.311532833002275,
+      "max_seconds": 2.31829879200086,
+      "maximum_sampled_peak_mb": 189.5
+    },
+    {
+      "case": "synthetic-cycle-50000",
+      "kind": "synthetic",
+      "nodes": 50000,
+      "input_bytes": 2666858,
+      "mode": "auto",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 1.1469778750033583,
+          "worker_seconds": 1.11802599998191,
+          "sampled_peak_mb": 111.67,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2466876,
+            "report": 490723,
+            "view": 2568847,
+            "explorer": 6501733
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 1.1341641249891836,
+          "worker_seconds": 1.0952858329983428,
+          "sampled_peak_mb": 119.03,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2466876,
+            "report": 490723,
+            "view": 2568847,
+            "explorer": 6501733
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 2.3133830839942675,
+          "worker_seconds": 2.2761611659952905,
+          "sampled_peak_mb": 115.45,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2466876,
+            "report": 490723,
+            "view": 2568847,
+            "explorer": 6501733
+          }
+        }
+      ],
+      "median_seconds": 1.1469778750033583,
+      "max_seconds": 2.3133830839942675,
+      "maximum_sampled_peak_mb": 119.03
+    },
+    {
+      "case": "synthetic-unique-50000",
+      "kind": "synthetic",
+      "nodes": 50000,
+      "input_bytes": 2855733,
+      "mode": "auto",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 4.276473083999008,
+          "worker_seconds": 4.244619708013488,
+          "sampled_peak_mb": 174.31,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2655753,
+            "report": 1168506,
+            "view": 5391029,
+            "explorer": 10640558
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 2.2249593749875203,
+          "worker_seconds": 2.1914425420109183,
+          "sampled_peak_mb": 165.97,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2655753,
+            "report": 1168506,
+            "view": 5391029,
+            "explorer": 10640558
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 2.406391208001878,
+          "worker_seconds": 2.3760697499965318,
+          "sampled_peak_mb": 164.05,
+          "summary": {
+            "graph_count": 1,
+            "node_count": 50000,
+            "class_count": 1,
+            "training_accuracy_upper_bound": {
+              "max_correct": 1,
+              "total": 1,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2655753,
+            "report": 1168506,
+            "view": 5391029,
+            "explorer": 10640558
+          }
+        }
+      ],
+      "median_seconds": 2.406391208001878,
+      "max_seconds": 4.276473083999008,
+      "maximum_sampled_peak_mb": 174.31
+    },
+    {
+      "case": "synthetic-path-1024",
+      "kind": "synthetic",
+      "nodes": 1024,
+      "input_bytes": 49065,
+      "mode": "trace",
+      "observations": [
+        {
+          "status": "rejected",
+          "wall_seconds": 0.3737493749940768,
+          "worker_seconds": 0.34469116700347513,
+          "sampled_peak_mb": 31.03,
+          "summary": null,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          },
+          "artifact_bytes": {}
+        },
+        {
+          "status": "rejected",
+          "wall_seconds": 0.38984091600286774,
+          "worker_seconds": 0.3525121249840595,
+          "sampled_peak_mb": 30.75,
+          "summary": null,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          },
+          "artifact_bytes": {}
+        },
+        {
+          "status": "rejected",
+          "wall_seconds": 0.3659299160062801,
+          "worker_seconds": 0.3340801660087891,
+          "sampled_peak_mb": 30.69,
+          "summary": null,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          },
+          "artifact_bytes": {}
+        }
+      ],
+      "median_seconds": 0.3737493749940768,
+      "max_seconds": 0.38984091600286774,
+      "maximum_sampled_peak_mb": 31.03
+    },
+    {
+      "case": "PROTEINS",
+      "kind": "actual_training_inputs",
+      "input_bytes": 2203539,
+      "mode": "auto",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 2.7905802500026766,
+          "worker_seconds": 2.751215374999447,
+          "sampled_peak_mb": 207.88,
+          "summary": {
+            "graph_count": 890,
+            "node_count": 34099,
+            "class_count": 888,
+            "training_accuracy_upper_bound": {
+              "max_correct": 890,
+              "total": 890,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2203538,
+            "report": 3752853,
+            "view": 4733902,
+            "explorer": 12475387
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 3.000774625019403,
+          "worker_seconds": 2.9650874999933876,
+          "sampled_peak_mb": 206.92,
+          "summary": {
+            "graph_count": 890,
+            "node_count": 34099,
+            "class_count": 888,
+            "training_accuracy_upper_bound": {
+              "max_correct": 890,
+              "total": 890,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2203538,
+            "report": 3752853,
+            "view": 4733902,
+            "explorer": 12475387
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 3.1331267500063404,
+          "worker_seconds": 3.0955175000126474,
+          "sampled_peak_mb": 210.28,
+          "summary": {
+            "graph_count": 890,
+            "node_count": 34099,
+            "class_count": 888,
+            "training_accuracy_upper_bound": {
+              "max_correct": 890,
+              "total": 890,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 2203538,
+            "report": 3752853,
+            "view": 4733902,
+            "explorer": 12475387
+          }
+        }
+      ],
+      "median_seconds": 3.000774625019403,
+      "max_seconds": 3.1331267500063404,
+      "maximum_sampled_peak_mb": 210.28
+    },
+    {
+      "case": "ENZYMES",
+      "kind": "actual_training_inputs",
+      "input_bytes": 3049464,
+      "mode": "auto",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 1.9015467910212465,
+          "worker_seconds": 1.8706015000061598,
+          "sampled_peak_mb": 148.59,
+          "summary": {
+            "graph_count": 480,
+            "node_count": 15480,
+            "class_count": 480,
+            "training_accuracy_upper_bound": {
+              "max_correct": 480,
+              "total": 480,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 3049463,
+            "report": 485451,
+            "view": 4237466,
+            "explorer": 8728954
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 1.8449992919922806,
+          "worker_seconds": 1.8147578750213142,
+          "sampled_peak_mb": 146.39,
+          "summary": {
+            "graph_count": 480,
+            "node_count": 15480,
+            "class_count": 480,
+            "training_accuracy_upper_bound": {
+              "max_correct": 480,
+              "total": 480,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 3049463,
+            "report": 485451,
+            "view": 4237466,
+            "explorer": 8728954
+          }
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 1.8771161659969948,
+          "worker_seconds": 1.837796875013737,
+          "sampled_peak_mb": 146.62,
+          "summary": {
+            "graph_count": 480,
+            "node_count": 15480,
+            "class_count": 480,
+            "training_accuracy_upper_bound": {
+              "max_correct": 480,
+              "total": 480,
+              "fraction": "1",
+              "value": 1.0
+            },
+            "unavoidable_training_errors": 0,
+            "conflicting_pair_count": 0,
+            "certificate_verified": true,
+            "engine": "partition"
+          },
+          "error": null,
+          "artifact_bytes": {
+            "inputs": 3049463,
+            "report": 485451,
+            "view": 4237466,
+            "explorer": 8728954
+          }
+        }
+      ],
+      "median_seconds": 1.8771161659969948,
+      "max_seconds": 1.9015467910212465,
+      "maximum_sampled_peak_mb": 148.59
+    }
+  ],
+  "interpretation": "Local probes include process startup, exact refinement, independent replay, all four artifacts and streamed reads. RSS is sampled, so may miss the true peak. Three repetitions are not a production p95 or throughput claim. Resource limits may reject difficult inputs below the node cap; rejected jobs publish no ceiling. Real inputs use the contract in real-data-study.json; no model training or held-out evaluation occurs."
+}

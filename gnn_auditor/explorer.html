@@ -85,7 +85,9 @@
     return;
   }
   const {dataset, report, benchmark} = payload;
-  const cert = report.certificate, graphs = dataset.graphs;
+  const summaryMode = payload.inspection && payload.inspection.mode === 'stable_only';
+  const cert = {rounds: payload.inspection && payload.inspection.rounds ? payload.inspection.rounds : report.certificate.rounds}, graphs = dataset.graphs;
+  const finalRound = cert.rounds.length - 1;
   const byId = new Map(graphs.map((g,i) => [g.id, {graph:g,index:i}]));
   const classFor = new Map(report.classes.flatMap(c => c.graph_ids.map(id => [id,c])));
   const $ = id => document.getElementById(id);
@@ -100,7 +102,8 @@
   text('errors',report.unavoidable_training_errors); text('sample-count',`${report.graph_count} training samples`);
   text('pairs',report.conflicting_pair_count); text('class-count',`${report.class_count} stable equivalence classes`);
   text('class-total',report.class_count);
-  $('round').max = report.stabilization_round;
+  $('round').max = finalRound;
+  $('round').disabled = summaryMode;
   let selectedNode = null;
   for (const side of ['a','b']) {
     for (const g of graphs) {const o=document.createElement('option');o.value=g.id;o.textContent=g.id;$('graph-'+side).append(o);}
@@ -148,8 +151,9 @@
   }
   function draw(side,g,index,round) {
     const svg=$('svg-'+side);svg.replaceChildren();svg.setAttribute('viewBox','0 0 360 250');
-    svg.append(element('title',{},`${g.id}: ${g.nodes.length} nodes, ${g.edges.length} edges, label ${labelText(g)}, refinement round ${round}`));
+    svg.append(element('title',{},`${g.id}: ${g.nodes.length} nodes, ${g.edges.length} edges, label ${labelText(g)}, ${summaryMode?'final stable colors':'refinement round '+round}`));
     if(!g.nodes.length){svg.append(element('text',{x:180,y:125,'text-anchor':'middle',class:'empty-graph'},'Empty graph'));return;}
+    if(g.nodes.length>500){svg.append(element('text',{x:180,y:125,'text-anchor':'middle',class:'empty-graph'},'Topology display limited to 500 nodes'));return;}
     const {points,lookup}=positions(g);
     for(const [u,v] of g.edges){const p=points[lookup.get(u)],q=points[lookup.get(v)];svg.append(element('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],class:'edge'}));}
     const colors=cert.rounds[round].node_colors[index];
@@ -175,7 +179,7 @@
     const c=cert.rounds[round].node_colors[index][selectedNode.v],signature=cert.rounds[round].palette[c];
     const title=document.createElement('strong');title.textContent=graph.id+' · node '+node.id+' · c'+c;parent.append(title,document.createElement('br'));
     parent.append(document.createTextNode('Actual input: '+JSON.stringify(node.features)+' · '+dataset.feature_dtype),document.createElement('br'));
-    const code=document.createElement('code');code.textContent=(round===0?'Exact feature values: ':'Signature [old color, neighbor color counts]: ')+JSON.stringify(signature);parent.append(code);
+    const code=document.createElement('code');code.textContent=(summaryMode?'Stable signature [color, neighbor color counts]: ':round===0?'Exact feature values: ':'Signature [old color, neighbor color counts]: ')+JSON.stringify(signature);parent.append(code);
   }
   function render() {
     const round=Number($('round').value),a=byId.get($('graph-a').value),b=byId.get($('graph-b').value);
@@ -186,7 +190,7 @@
     text('match-status',match?'Exact color counts match':'Color counts differ');$('match-status').classList.toggle('separated',!match);
     text('comparison-subtitle',ca.id===cb.id?ca.id+' · stable 1-WL equivalence':ca.id+' vs '+cb.id+' · distinct stable classes');
     for(const [side,entry] of [['a',a],['b',b]]){text('meta-'+side,`Label ${labelText(entry.graph)} · ${entry.graph.nodes.length} nodes · ${entry.graph.edges.length} edges`);draw(side,entry.graph,entry.index,round);}
-    text('round-label','Round '+round);text('round-count',round===report.stabilization_round?'Stable partition':'of '+report.stabilization_round);
+    text('round-label',summaryMode?'Final stable colors':'Round '+round);text('round-count',summaryMode?'Compact split certificate; no round trace':round===finalRound?'Stable partition':'of '+finalRound);
     histogram('a',ha);histogram('b',hb);renderDetail(round);
     const distinct=a.graph.id!==b.graph.id;
     text('comparison-note',ca.id===cb.id

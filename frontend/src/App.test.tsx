@@ -181,3 +181,38 @@ test("oversized files are rejected before upload", async () => {
     "File is too large",
   );
 });
+
+test("explicit compact mode submits original text and mode changes clear completed results", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/config") return json(config);
+      if (url === "/api/demo") return new Response(raw);
+      if (url === "/api/jobs?mode=partition") {
+        expect(init?.body).toBe(raw);
+        return json({
+          ...completed,
+          summary: { ...completed.summary, engine: "partition" },
+        });
+      }
+      if (url.endsWith("/view")) return json({});
+      throw new Error(`Unexpected request ${url}`);
+    }),
+  );
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Load demo" }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: "Run exact audit" }),
+    ).toBeEnabled(),
+  );
+  fireEvent.change(screen.getByRole("combobox", { name: "Audit mode" }), {
+    target: { value: "partition" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Run exact audit" }));
+  expect(await screen.findByText("80%")).toBeInTheDocument();
+  fireEvent.change(screen.getByRole("combobox", { name: "Audit mode" }), {
+    target: { value: "trace" },
+  });
+  expect(screen.queryByText("80%")).not.toBeInTheDocument();
+});

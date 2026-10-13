@@ -10,7 +10,7 @@ Only `completed` jobs expose artifacts. A worker loads the original JSON text wi
 
 Cancellation terminates the worker and removes partial artifacts. Runtime and RSS watchdogs supervise execution; Linux workers also have an address-space limit. Admission is bounded across the whole single process. Multiple Uvicorn workers would create independent queues and violate the intended global capacity; use exactly one worker.
 
-The HTTP server caps concurrent requests at 32 in Docker, and uploads have a 10-second read deadline and an enforced streamed byte limit. Job overload returns 429 with Retry-After. Server connection overload can return 503. This anonymous demonstration service has no fairness guarantees or durable scheduler.
+The HTTP server caps concurrent requests at 32 in Docker. At most two upload bodies are buffered concurrently, each with a 10-second read deadline and enforced byte limit; job capacity is checked before buffering. Artifacts stream in 64 KiB chunks from a file opened under the expiry lock. An already-open download may finish after TTL expiry; new requests receive 404. Job/upload overload returns 429 with Retry-After. Server connection overload can return 503. This anonymous service has no fairness guarantees or durable scheduler.
 
 ## API
 
@@ -19,8 +19,8 @@ The HTTP server caps concurrent requests at 32 in Docker, and uploads have a 10-
 | `GET /api/health` | Readiness and active/queued counts; no dataset identifiers |
 | `GET /api/config` | Public input/execution budgets and scope |
 | `GET /api/demo` | Packaged synthetic fixture |
-| `POST /api/jobs` | Original UTF-8 JSON body; Content-Type application/json; 202 admission |
-| `GET /api/jobs/{id}` | State, actual round/color progress, completed summary or readable failure |
+| `POST /api/jobs?mode=auto` | Original UTF-8 JSON body; Content-Type application/json; 202 admission; auto/trace/partition mode |
+| `GET /api/jobs/{id}` | State, actual round or processed-splitter/color progress, completed summary or readable failure |
 | `DELETE /api/jobs/{id}` | Cancel queued/running work; terminal jobs remain terminal |
 | `GET /api/jobs/{id}/report` | Exact JSON report and certificate download |
 | `GET /api/jobs/{id}/inputs` | Exact represented input JSON download |
@@ -35,11 +35,12 @@ Do not parse/reserialize datasets through JavaScript before submitting: doing so
 
 | Budget | Default |
 |---|---:|
-| Upload bytes | 1 MiB |
-| Graphs / total nodes / total edges | 128 / 2,048 / 8,192 |
+| Upload bytes | 16 MiB |
+| Graphs / total nodes / total edges | 2,048 / 50,000 / 200,000 |
 | Feature dimension | 64 |
 | Cumulative node-round trace cells | 131,072 |
-| Total serialized artifacts | 16 MiB |
+| Moved vertices recorded in compact split evidence | 500,000 |
+| Total serialized artifacts | 64 MiB |
 | Worker wall time / memory | 20 seconds / 256 MiB |
 | Active workers / queued jobs | 1 / 3 |
 | Retained jobs | 8 |
@@ -47,7 +48,9 @@ Do not parse/reserialize datasets through JavaScript before submitting: doing so
 
 These are admission ceilings, not promises that every input below them completes. Difficult refinement or large artifacts can hit a later budget. Override through `AUDITOR_` plus the uppercase field name in `gnn_auditor/service/limits.py`. Validate changed settings with the capacity probe and failure suite; instance-level memory must cover the API plus all workers and downloads.
 
-The browser draws topology up to 500 nodes per graph; larger graphs retain all audited inputs and can be inspected through node selection and exports. Display limits never alter the audit.
+Automatic mode uses synchronous trace refinement for at most 512 total nodes; larger inputs use the compact partition engine. Both have independent verifiers. Explicit trace mode may hit its trace budget on a long path; automatic/compact mode avoids retaining all rounds. Progress counts are actual work, not completion percentages. v1 certificates contain rounds; v2 contain justified split events and final colors. Work telemetry is a producer measurement, not verified mathematical evidence.
+
+The browser draws topology up to 500 nodes per graph. Larger graphs retain all audited inputs and have a node-ID search with up to 200 displayed options. Color histograms paginate 100 entries and classes paginate 20 entries, with search and conflict filtering. These display bounds never alter the audit. Compact inspection is labeled final-only; its single display snapshot is not a synchronous WL round. Full v2 evidence remains in the certificate download, with no duplicated event trace in the inspection payload.
 
 ## Privacy, expiry and restart
 
@@ -55,13 +58,15 @@ No accounts or persistent dataset history are implemented. Job URLs are bearer c
 
 Uvicorn access logging is disabled so capability URLs and dataset details do not enter request logs. Worker failures return fixed internal-error messages. No uploaded model files, executable files or pickles are accepted. Audit inputs are always numeric, declarative graph JSON.
 
-The API is scoped to a small anonymous demo, not confidential multi-user research hosting. It has no authentication, per-user quotas or durable recovery. Adding such requirements needs a separate access/storage design.
+The API is a bounded anonymous auditing tool. It has no authentication, per-user quotas or durable recovery. Confidential multi-user hosting needs a separate access/storage design.
 
 ## Deployment
 
 `Dockerfile` builds the TypeScript frontend in Node 24, installs locked Python service dependencies into Python 3.13, and runs as a non-root user. PyTorch is absent. One web container serves both layers under the same origin.
 
-`render.yaml` is a prepared Render Blueprint with manual deployment and one worker. Its Starter plan selection is configuration, not a purchased service. No hosting resources have been created. Before applying it, confirm account access and plan cost, use the tested commit, and run staging checks for HTTPS, complete upload/export, invalid inputs, cancellation, overload, expiry and restart behavior. Keep public deployment on hold until those checks pass.
+`render.yaml` is a prepared Render Blueprint with manual deployment, the Free compute plan and one worker. No hosting resources have been created. The hosting integration still needs to be installed/connected and permitted to read the private repository. Deploy the tested commit, then verify HTTPS, complete upload/export, invalid inputs, cancellation, overload, expiry and restart behavior before claiming a live release. No paid resource is authorized by this configuration.
+
+Render describes Free services as previews/hobby services, with idle spin-down after 15 minutes and filesystem loss on restart/spin-down. A resume demonstration can use that plan with explicit cold-start and expiry expectations; it is not an always-on production SLA. Bandwidth/build allowances and spend settings are workspace-dependent. See [Render Free limitations](https://render.com/docs/free). Paid compute is a separate budget decision if an always-on service becomes necessary.
 
 Linux CI builds and runs the actual Docker image. The local Docker engine was stopped during development, so the container evidence must come from that CI run. Follow the status recorded in VERIFICATION.md rather than treating a Dockerfile as a successful deployment.
 
@@ -69,6 +74,8 @@ Primary deployment references: [FastAPI workers](https://fastapi.tiangolo.com/de
 
 ## Reproducing performance evidence
 
-Run `.venv/bin/python scripts/measure_service.py --output docs/performance.json`. The saved macOS probes run each case five times and include worker startup, refinement, independent replay and serialization. Observed completed medians were 0.20–0.31 seconds, with sampled RSS at most 40.42 MiB. The 1,024-node path was rejected at the trace budget with no ceiling.
+`docs/performance.json` preserves the original v0.2 small-prototype probes. For current automatic/compact mode run `.venv/bin/python scripts/measure_scale_service.py --root /tmp/gnn-tu-data`, after regenerating the training inputs with `scripts/real_data_study.py`. Use separate lightweight service and ML environments so serving-worker RSS does not include PyTorch.
+
+Current macOS probes use three repetitions, including startup, refinement, independent replay, serialization of four artifacts and streamed reads. 50,000-node paths, cycles and uniquely featured paths completed, as did PROTEINS and ENZYMES training inputs. Completed medians for those larger cases were 1.15–3.00 seconds and maximum sampled worker RSS was 210.28 MiB. An explicitly requested 1,024-node full trace was rejected with no ceiling. Complete records are in `docs/scale-service-performance.json` and actual-input provenance in `docs/real-data-study.json`.
 
 These small probes do not establish production p95, maximum throughput or a hosting bill. RSS is sampled every 20ms and can miss a transient peak. Repeat on the target Linux instance and investigate difficult topologies before expanding limits.
