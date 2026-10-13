@@ -16,11 +16,11 @@ LIMITATIONS = [
 ]
 
 
-def build_report(dataset: Dataset, result: Refinement, max_pairs: int = 20) -> dict:
+def build_class_report(dataset: Dataset, stable_histograms, max_pairs: int = 20) -> dict:
     if type(max_pairs) is not int or max_pairs < 0:
         raise ValueError("max_pairs must be a nonnegative integer")
     grouped = {}
-    for i, histogram in enumerate(result.stable_histograms):
+    for i, histogram in enumerate(stable_histograms):
         grouped.setdefault(histogram, []).append(i)
     # Membership order is independent of input graph order; color IDs are local.
     groups = sorted(grouped.items(), key=lambda item: tuple(sorted(dataset.graphs[i].id for i in item[1])))
@@ -54,20 +54,17 @@ def build_report(dataset: Dataset, result: Refinement, max_pairs: int = 20) -> d
                 if label_key(ga.label) == label_key(gb.label):
                     continue
                 witnesses.append({"class_id": cid, "graph_a": ga.id, "label_a": ga.label,
-                                  "graph_b": gb.id, "label_b": gb.label,
-                                  "matching_histograms_by_round": [[list(x) for x in r.histograms[a]] for r in result.rounds]})
+                                  "graph_b": gb.id, "label_b": gb.label})
                 if len(witnesses) == max_pairs:
                     break
     total = len(dataset.graphs)
     fraction = Fraction(correct, total)
     return {
-        "report_version": 1, "method": "exact_joint_1wl_to_stability", "split": "train",
+        "split": "train",
         "feature_dtype": dataset.feature_dtype, "feature_dim": dataset.feature_dim,
         "feature_equality": "exact represented IEEE values; signed zeros equal; no tolerance or binning",
         "graph_count": total, "node_count": sum(len(g.node_ids) for g in dataset.graphs),
         "edge_count": sum(len(g.edges) for g in dataset.graphs), "class_count": len(classes),
-        "stabilization_round": result.rounds[-1].index,
-        "rounds": [{"round": r.index, "color_count": len(r.palette)} for r in result.rounds],
         "training_accuracy_upper_bound": {"max_correct": correct, "total": total,
                                           "fraction": str(fraction), "value": correct / total},
         "unavoidable_training_errors": total - correct,
@@ -77,6 +74,18 @@ def build_report(dataset: Dataset, result: Refinement, max_pairs: int = 20) -> d
         "conflict_witnesses_omitted": conflict_pairs - len(witnesses),
         "classes": classes, "conflict_witnesses": witnesses, "limitations": LIMITATIONS,
     }
+
+
+def build_report(dataset: Dataset, result: Refinement, max_pairs: int = 20) -> dict:
+    report = build_class_report(dataset, result.stable_histograms, max_pairs)
+    report.update({"report_version": 1, "method": "exact_joint_1wl_to_stability",
+                   "stabilization_round": result.rounds[-1].index,
+                   "rounds": [{"round": r.index, "color_count": len(r.palette)} for r in result.rounds]})
+    indices = {g.id: i for i, g in enumerate(dataset.graphs)}
+    for witness in report["conflict_witnesses"]:
+        a = indices[witness["graph_a"]]
+        witness["matching_histograms_by_round"] = [[list(x) for x in r.histograms[a]] for r in result.rounds]
+    return report
 
 
 def certificate(dataset: Dataset, result: Refinement) -> dict:
@@ -99,7 +108,8 @@ def text_report(report: dict) -> str:
     lines = ["GNN Feasibility Auditor — exact feature-aware 1-WL",
              f"Training accuracy upper bound: {bound['max_correct']}/{bound['total']} = {100 * bound['value']:.2f}%",
              f"Unavoidable training errors: {report['unavoidable_training_errors']}",
-             f"Graphs: {report['graph_count']} | WL classes: {report['class_count']} | Stable at round: {report['stabilization_round']}",
+             f"Graphs: {report['graph_count']} | WL classes: {report['class_count']} | " +
+             (f"Stable at round: {report['stabilization_round']}" if report["report_version"] == 1 else f"Verified partition splits: {report['split_count']}"),
              f"Features: {report['feature_dim']}D {report['feature_dtype']} (exact represented values)",
              f"Indistinguishable pairs: {report['indistinguishable_pair_count']} | Cross-label pairs: {report['conflicting_pair_count']}",
              "", "Conflicting equivalence classes:"]
@@ -114,7 +124,10 @@ def text_report(report: dict) -> str:
     lines.extend(["", "Concrete cross-label witnesses:"])
     for pair in report["conflict_witnesses"]:
         lines.append(f"  {pair['graph_a']} ({pair['label_a']!r}) <-> {pair['graph_b']} ({pair['label_b']!r}) [{pair['class_id']}]")
-        lines.append("    Matching exact color histograms in rounds " + ", ".join(map(str, range(len(pair['matching_histograms_by_round'])))))
+        if "matching_histograms_by_round" in pair:
+            lines.append("    Matching exact color histograms in rounds " + ", ".join(map(str, range(len(pair['matching_histograms_by_round'])))))
+        else:
+            lines.append("    Matching complete stable color histograms; compact justified-split certificate.")
     if report["conflict_witnesses_omitted"]:
         lines.append(f"  {report['conflict_witnesses_omitted']} further witness pairs omitted; all class memberships are included.")
     lines.extend(["", *report["limitations"]])

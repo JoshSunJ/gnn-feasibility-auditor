@@ -6,6 +6,7 @@ from pathlib import Path
 from .data import Dataset, dataset_object
 from .report import audit
 from .verify import verify_report
+from .inspection import inspection_payload
 
 
 def render_html(dataset: Dataset, benchmark: dict | None = None) -> str:
@@ -32,11 +33,9 @@ def render_verified_html(dataset: Dataset, report: dict, benchmark: dict | None 
     inputs = dataset_object(dataset)
     # JS numbers cannot preserve arbitrarily large integer labels. Use exact
     # source text for downloads and parallel textual labels for all display.
-    payload = {"dataset": inputs, "report": report, "benchmark": benchmark,
-               "graph_label_text": {g.id: json.dumps(g.label, ensure_ascii=True) for g in dataset.graphs},
-               "class_label_text": {c["id"]: [json.dumps(x["label"], ensure_ascii=True) for x in c["label_counts"]] for c in report["classes"]},
-               "dataset_json": json.dumps(inputs, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
-               "report_json": json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + "\n"}
+    payload = {**inspection_payload(dataset, report, inputs=inputs), "benchmark": benchmark,
+               "dataset_json": json.dumps(inputs, separators=(",", ":"), ensure_ascii=False, allow_nan=False) + "\n",
+               "report_json": json.dumps(report, separators=(",", ":"), ensure_ascii=False, allow_nan=False) + "\n"}
     safe_json = json.dumps(payload, ensure_ascii=True, allow_nan=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     template = Path(__file__).with_name("explorer.html").read_text(encoding="utf-8")
     return template.replace("__AUDIT_PAYLOAD__", safe_json)
