@@ -8,9 +8,9 @@ Branch: `feature/scale-and-live-release`. Hosting is authorized by the user; acc
 |---|---|---|
 | Research and compact exact engine | SCALE_RESEARCH.md; 5,265 independent oracle pairs; separate justified-split replay, tamper and stability checks | Complete locally |
 | Actual-feature studies | PROTEINS/ENZYMES fixed training selections: 1,370 graphs, 49,579 nodes; both 100% ceilings honestly recorded | Complete |
-| Larger bounded service | 50,000-node synthetic paths/cycles/unique features and both real inputs completed in three local repetitions; streamed exports, bounded upload buffers | Complete locally; Linux/hosted checks pending |
-| Usable large-data inspection | Mode choice, final-only compact view, conflict/ID filtering, class/color pagination and full node-ID search | 8 component tests and build passed; browser checks pending |
-| Review and Linux packaging | Focused commits, PR, installed CLI + browser + 50k-node Linux Docker smoke | Pending CI |
+| Larger bounded service | 50,000-node synthetic paths/cycles/unique features and both real inputs completed in three local repetitions; actual 50k-node Linux Docker path completed; streamed exports, bounded upload buffers | Complete locally and in Linux CI; target-host capacity remains separate |
+| Usable large-data inspection | Mode choice, final-only compact view, conflict/ID filtering, class/color pagination and full node-ID search | 8 component tests, 6 Linux browser workflows, complete local PROTEINS upload and mobile checks passed |
+| Review and Linux packaging | Focused commits, PR #4, installed CLI + browser + 50k-node Linux Docker smoke | All 5 jobs passed for `0b97056`; final evidence/layout commit will be checked before merge |
 | Live deployment | Free/manual Render Blueprint; full service, no screenshot substitute | Blocked on installing/connecting Render and private-repository access; no deployment claimed |
 
 The v0.2 release record below is historical. Real input audits now exist; real-data model training remains future work.

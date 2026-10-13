@@ -86,29 +86,35 @@ export default function Comparison({ view }: { view: View }) {
           {pageCount}
         </small>
         {matchingClasses.length === 0 && <p>No classes match these filters.</p>}
-        {matchingClasses.slice(page * 20, (page + 1) * 20).map((c) => (
-          <button
-            className={`class-card ${classA.id === c.id && equivalent ? "selected" : ""}`}
-            key={c.id}
-            onClick={() => chooseClass(c)}
-            aria-pressed={classA.id === c.id && equivalent}
-          >
-            <strong>
-              {c.id} · {c.size} graph{c.size === 1 ? "" : "s"}
-            </strong>
-            <span>
-              {c.unavoidable_errors > 0 ? "Mixed labels" : "Consistent labels"}
-            </span>
-            <span>
-              {c.label_counts
-                .map((x, i) => `${view.class_label_text[c.id][i]} × ${x.count}`)
-                .join(" · ")}
-            </span>
-            <small>
-              At most {c.max_correct}/{c.size} correct
-            </small>
-          </button>
-        ))}
+        <div className="class-results" key={page}>
+          {matchingClasses.slice(page * 20, (page + 1) * 20).map((c) => (
+            <button
+              className={`class-card ${classA.id === c.id && equivalent ? "selected" : ""}`}
+              key={c.id}
+              onClick={() => chooseClass(c)}
+              aria-pressed={classA.id === c.id && equivalent}
+            >
+              <strong>
+                {c.id} · {c.size} graph{c.size === 1 ? "" : "s"}
+              </strong>
+              <span>
+                {c.unavoidable_errors > 0
+                  ? "Mixed labels"
+                  : "Consistent labels"}
+              </span>
+              <span>
+                {c.label_counts
+                  .map(
+                    (x, i) => `${view.class_label_text[c.id][i]} × ${x.count}`,
+                  )
+                  .join(" · ")}
+              </span>
+              <small>
+                At most {c.max_correct}/{c.size} correct
+              </small>
+            </button>
+          ))}
+        </div>
         {pageCount > 1 && (
           <div className="class-pages">
             <button

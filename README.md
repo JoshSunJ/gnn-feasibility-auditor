@@ -74,8 +74,12 @@ Install `.[pyg]` in a separate ML environment. Accept in-memory `Data` objects a
 
 ```python
 from gnn_auditor.pyg import dataset_from_pyg, audit_pyg
+from gnn_auditor.partition import audit_partition
 
 report = audit_pyg(graphs, train_indices=[0, 3, 8], include_certificate=True)
+# For larger training inputs, use the compact engine after the same strict adapter.
+data = dataset_from_pyg(graphs, train_indices=training_positions)
+report = audit_partition(data, include_certificate=True)
 ```
 
 The adapter preserves `x`, dtype, dimension, integer graph labels, isolated nodes and explicit training selection. It accepts exactly one reciprocal COO entry per direction for each simple undirected edge. Extra fields such as `edge_attr`, `pos`, `batch` and weights, missing features, self-loops, parallel edges and mixed precision are rejected. It does not load uploaded pickles or infer replacement features. `dataset_from_pyg` returns the same `Dataset` used by the CLI; use `dataset_object` to export its represented inputs.
