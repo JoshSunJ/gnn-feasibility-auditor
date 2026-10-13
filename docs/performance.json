@@ -1,0 +1,286 @@
+{
+  "kind": "synthetic_service_capacity_probe",
+  "environment": {
+    "python": "3.13.13",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O"
+  },
+  "limits": {
+    "max_bytes": 1048576,
+    "max_graphs": 128,
+    "max_nodes": 2048,
+    "max_edges": 8192,
+    "max_feature_dim": 64,
+    "max_trace_cells": 131072,
+    "max_output_bytes": 16777216,
+    "timeout_seconds": 20,
+    "memory_mb": 256,
+    "max_active": 1,
+    "max_queued": 3,
+    "max_retained": 8,
+    "ttl_seconds": 900
+  },
+  "repetitions": 5,
+  "cases": [
+    {
+      "nodes": 128,
+      "topology": "path",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 0.35828662500716746,
+          "worker_seconds": 0.3276155839848798,
+          "sampled_peak_mb": 39.44,
+          "round": 64,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.5726765840081498,
+          "worker_seconds": 0.546727542008739,
+          "sampled_peak_mb": 38.81,
+          "round": 64,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.30746595800155774,
+          "worker_seconds": 0.27079929198953323,
+          "sampled_peak_mb": 40.42,
+          "round": 64,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.27211058302782476,
+          "worker_seconds": 0.2402563340147026,
+          "sampled_peak_mb": 36.42,
+          "round": 64,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.26742170899524353,
+          "worker_seconds": 0.24661454200395383,
+          "sampled_peak_mb": 39.38,
+          "round": 64,
+          "error": null
+        }
+      ],
+      "median_seconds": 0.30746595800155774,
+      "max_seconds": 0.5726765840081498,
+      "maximum_sampled_peak_mb": 40.42
+    },
+    {
+      "nodes": 512,
+      "topology": "cycle",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 0.18567266600439325,
+          "worker_seconds": 0.1500099160184618,
+          "sampled_peak_mb": 32.59,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.20019900001352653,
+          "worker_seconds": 0.17029433397692628,
+          "sampled_peak_mb": 32.27,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.17634933401132002,
+          "worker_seconds": 0.14750595798250288,
+          "sampled_peak_mb": 32.33,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.3114325829956215,
+          "worker_seconds": 0.2773866670031566,
+          "sampled_peak_mb": 31.61,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.2089701250079088,
+          "worker_seconds": 0.17580333299702033,
+          "sampled_peak_mb": 32.58,
+          "round": 1,
+          "error": null
+        }
+      ],
+      "median_seconds": 0.20019900001352653,
+      "max_seconds": 0.3114325829956215,
+      "maximum_sampled_peak_mb": 32.59
+    },
+    {
+      "nodes": 2048,
+      "topology": "cycle",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 0.29534254100872204,
+          "worker_seconds": 0.2654872919956688,
+          "sampled_peak_mb": 35.02,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.33557045899215154,
+          "worker_seconds": 0.3004192500084173,
+          "sampled_peak_mb": 34.58,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.24021808299585246,
+          "worker_seconds": 0.2030292089912109,
+          "sampled_peak_mb": 37.25,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.20956316697993316,
+          "worker_seconds": 0.18082533302367665,
+          "sampled_peak_mb": 37.59,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.2957862920011394,
+          "worker_seconds": 0.2674295830074698,
+          "sampled_peak_mb": 33.95,
+          "round": 1,
+          "error": null
+        }
+      ],
+      "median_seconds": 0.29534254100872204,
+      "max_seconds": 0.33557045899215154,
+      "maximum_sampled_peak_mb": 37.59
+    },
+    {
+      "nodes": 512,
+      "topology": "unique",
+      "observations": [
+        {
+          "status": "completed",
+          "wall_seconds": 0.20239270801539533,
+          "worker_seconds": 0.17205583298346028,
+          "sampled_peak_mb": 32.2,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.20962345899897628,
+          "worker_seconds": 0.17565220801043324,
+          "sampled_peak_mb": 32.42,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.2111304169811774,
+          "worker_seconds": 0.17625466699246317,
+          "sampled_peak_mb": 32.78,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.23521895898738876,
+          "worker_seconds": 0.19976724998559803,
+          "sampled_peak_mb": 35.12,
+          "round": 1,
+          "error": null
+        },
+        {
+          "status": "completed",
+          "wall_seconds": 0.2289746250025928,
+          "worker_seconds": 0.20119795799837448,
+          "sampled_peak_mb": 35.58,
+          "round": 1,
+          "error": null
+        }
+      ],
+      "median_seconds": 0.2111304169811774,
+      "max_seconds": 0.23521895898738876,
+      "maximum_sampled_peak_mb": 35.58
+    },
+    {
+      "nodes": 1024,
+      "topology": "path",
+      "observations": [
+        {
+          "status": "rejected",
+          "wall_seconds": 0.4103457500168588,
+          "worker_seconds": 0.373456332978094,
+          "sampled_peak_mb": 35.73,
+          "round": 127,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          }
+        },
+        {
+          "status": "rejected",
+          "wall_seconds": 0.39092770899878815,
+          "worker_seconds": 0.3620656249986496,
+          "sampled_peak_mb": 35.56,
+          "round": 127,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          }
+        },
+        {
+          "status": "rejected",
+          "wall_seconds": 0.415085500018904,
+          "worker_seconds": 0.38764837497728877,
+          "sampled_peak_mb": 35.5,
+          "round": 127,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          }
+        },
+        {
+          "status": "rejected",
+          "wall_seconds": 0.39334366598632187,
+          "worker_seconds": 0.3651642499899026,
+          "sampled_peak_mb": 35.77,
+          "round": 127,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          }
+        },
+        {
+          "status": "rejected",
+          "wall_seconds": 0.8013881660008337,
+          "worker_seconds": 0.7669983750092797,
+          "sampled_peak_mb": 32.95,
+          "round": 127,
+          "error": {
+            "code": "resource_limit",
+            "message": "The refinement trace exceeded this service's budget. No ceiling was certified."
+          }
+        }
+      ],
+      "median_seconds": 0.4103457500168588,
+      "max_seconds": 0.8013881660008337,
+      "maximum_sampled_peak_mb": 35.77
+    }
+  ],
+  "interpretation": "Small synthetic probes include process startup, refinement, independent replay and artifact serialization. Sampled RSS is a lower bound on the true peak. Five repetitions do not establish production p95 or throughput. Rejected jobs have no certified ceiling."
+}

@@ -2,7 +2,7 @@
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable
 
 from .data import Dataset, feature_key
 
@@ -44,7 +44,7 @@ def _round(index: int, signatures: list[Any], sizes: list[int]) -> Round:
     return Round(index, palette, tuple(node_colors), histograms)
 
 
-def refine(dataset: Dataset) -> Refinement:
+def refine(dataset: Dataset, *, on_round: Callable[[Round], None] | None = None) -> Refinement:
     """Run to a stable partition on the whole disjoint union, with a shared palette.
 
     No iteration cap: a non-splitting round is required, even if all graphs are
@@ -52,6 +52,8 @@ def refine(dataset: Dataset) -> Refinement:
     """
     sizes = [len(g.node_ids) for g in dataset.graphs]
     rounds = [_round(0, [feature_key(x) for g in dataset.graphs for x in g.features], sizes)]
+    if on_round:
+        on_round(rounds[0])
     while True:
         previous = rounds[-1]
         signatures = []
@@ -61,6 +63,8 @@ def refine(dataset: Dataset) -> Refinement:
                 signatures.append((colors[v], multiset))
         current = _round(previous.index + 1, signatures, sizes)
         rounds.append(current)
+        if on_round:
+            on_round(current)
         assert len(current.palette) >= len(previous.palette), "retained colors cannot merge"
         if len(current.palette) == len(previous.palette):
             return Refinement(tuple(rounds))

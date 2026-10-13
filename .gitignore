@@ -4,3 +4,15 @@ __pycache__/
 .venv/
 build/
 dist/
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+.env
+.env.*
+!.env.example
+.pytest_cache/
+.hypothesis/
+.DS_Store
+runtime/
+*.tsbuildinfo

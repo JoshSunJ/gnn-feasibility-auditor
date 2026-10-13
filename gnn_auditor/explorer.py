@@ -10,6 +10,11 @@ from .verify import verify_report
 
 def render_html(dataset: Dataset, benchmark: dict | None = None) -> str:
     report = audit(dataset, max_pairs=100, include_certificate=True)
+    return render_verified_html(dataset, report, benchmark)
+
+
+def render_verified_html(dataset: Dataset, report: dict, benchmark: dict | None = None) -> str:
+    """Render supplied evidence only after independent replay against actual inputs."""
     verify_report(dataset, report)
     if benchmark is not None:
         # A benchmark is an empirical attachment, not certificate evidence.

@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: gnn-feasibility-auditor
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    autoDeployTrigger: off
+    envVars:
+      - key: AUDITOR_MAX_ACTIVE
+        value: "1"
+      - key: AUDITOR_MAX_QUEUED
+        value: "3"
+      - key: AUDITOR_MEMORY_MB
+        value: "256"
+      - key: AUDITOR_TIMEOUT_SECONDS
+        value: "20"
+      - key: AUDITOR_TTL_SECONDS
+        value: "900"
