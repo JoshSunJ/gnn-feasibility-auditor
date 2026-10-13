@@ -79,7 +79,7 @@ test("compact proof mode and class search work without presenting fake refinemen
     .getByRole("checkbox", { name: "Conflicting classes only" })
     .uncheck();
   await expect(page.getByText("1 matching classes · page 1/1")).toBeVisible();
-  await page.getByRole("button", { name: /WL.* · 1 graph/ }).click();
+  await page.getByRole("button", { name: / · 1 graph/ }).click();
   await expect(
     page.getByRole("combobox", { name: "Graph A", exact: true }),
   ).toHaveValue("path-6");
