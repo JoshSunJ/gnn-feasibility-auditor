@@ -1,18 +1,70 @@
 # GNN Feasibility Auditor
 
-A small research-first prototype for graph-level classification. It audits the **actual node features** using exact joint 1-WL color refinement, finds indistinguishable graphs with conflicting training labels, and computes the resulting training-accuracy upper bound.
+A research-first auditing library and full-stack application for graph-level classification. It audits the **actual node features** using exact joint 1-WL color refinement, finds indistinguishable graphs with conflicting training labels, and computes the resulting training-accuracy upper bound.
 
-The core needs only Python 3.10+. Benchmarks are optional and need PyTorch. The visual explorer is a self-contained local report; it works offline and displays results from the verified Python engine.
+The core needs only Python 3.10+. The service uses Python 3.13, FastAPI and supervised worker processes; the interface uses React, TypeScript and Cytoscape.js. Benchmarks and the PyTorch Geometric adapter are optional. Independently verified reports can also be exported as self-contained offline HTML.
+
+Private project: [repository](https://github.com/JoshSunJ/gnn-feasibility-auditor), [release tracker](https://github.com/JoshSunJ/gnn-feasibility-auditor/issues/1), [release checks](https://github.com/JoshSunJ/gnn-feasibility-auditor/actions). Public hosting remains on hold until release/staging gates pass. The application has no real-data ML study yet; saved model fits use the synthetic correctness fixture.
 
 Read [RESEARCH.md](RESEARCH.md) for the mathematical claim, assumptions, data format, proof sketch, primary references and correctness criteria. Read [VERIFICATION.md](VERIFICATION.md) for the acceptance gate and measured results. The core passed before benchmarks or the interface were implemented.
 
 ## Start here
 
-Open **[index.html](index.html)** at the project root for the working five-graph demo. Choose a WL class, choose Graph A and Graph B, move the refinement slider, and select nodes to inspect their actual input features. The default comparison is the six-cycle versus two disconnected triangles.
+For the complete upload-to-report application, use Python 3.13 and Node 24:
+
+```sh
+python3.13 -m venv .venv
+.venv/bin/python -m pip install -r requirements-test.lock
+npm --prefix frontend ci
+npm --prefix frontend run build
+.venv/bin/python -m uvicorn gnn_auditor.service.app:app --host 127.0.0.1 --port 8000 --workers 1 --limit-concurrency 32 --no-access-log
+```
+
+Open **http://127.0.0.1:8000**, select **Load demo** or choose a supported training JSON file, then **Run exact audit**. The interface shows real job state, cancellation, verified results, graph comparison by refinement round, actual-feature inspection and exact downloads. Changing the input clears previous results. API documentation is at `/docs`.
+
+For frontend development, run `npm --prefix frontend run dev` alongside the Python service; Vite proxies `/api` to port 8000. For a Docker deployment, run `docker build -t gnn-auditor .` and `docker run --rm -p 8000:8000 gnn-auditor`. See [OPERATIONS.md](OPERATIONS.md) for execution budgets, temporary-data behavior and deployment instructions.
+
+For an offline demonstration requiring no server, open **[index.html](index.html)** at the project root. This is a saved five-graph report, separate from the live application. Choose a WL class, choose Graph A and Graph B, move the refinement slider, and select nodes to inspect their actual input features. The default comparison is the six-cycle versus two disconnected triangles.
 
 `gnn_auditor/explorer.html` is the source template and has no embedded dataset. Opening it directly now shows an explanation and a link to the working demo, instead of empty graph selectors. `examples/explorer.html` is also a generated, usable report.
 
-The current browser interface cannot ingest a new training set. To use your own data, export the strict training JSON described below, audit it with the CLI, then generate its visual report. [SHIPPING_PLAN.md](SHIPPING_PLAN.md) records the chosen stack, useful next features, and public-release gates. Public deployment is on hold.
+The live interface accepts training JSON; the offline report only inspects its embedded inputs. You can also audit data with the CLI and generate an offline report. [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) records implementation status; [SHIPPING_PLAN.md](SHIPPING_PLAN.md) preserves the product direction and release gates.
+
+## Engineering structure
+
+```text
+gnn_auditor/            exact core, independent verifier, CLI and optional ML tools
+gnn_auditor/service/    HTTP contracts, admission queue, isolated workers and budgets
+frontend/src/          React/TypeScript upload, job state and Cytoscape comparison
+frontend/e2e/          desktop/mobile Playwright workflows used in Linux CI
+tests/                 independent oracle, generated properties, service failures, adapters
+scripts/               container smoke test and reproducible capacity probes
+.github/workflows/     core, service/browser, optional ML and Linux Docker checks
+```
+
+The same Python engine serves notebooks, CLI and HTTP jobs. The browser displays verified evidence rather than implementing WL again. A worker publishes artifacts only after refinement stabilizes and independent certificate replay succeeds. Interrupted jobs never expose a ceiling. See [OPERATIONS.md](OPERATIONS.md) for the lifecycle and tradeoffs.
+
+## Optional PyTorch Geometric ingestion
+
+Install `.[pyg]` in a separate ML environment. Accept in-memory `Data` objects after the actual model preprocessing:
+
+```python
+from gnn_auditor.pyg import dataset_from_pyg, audit_pyg
+
+report = audit_pyg(graphs, train_indices=[0, 3, 8], include_certificate=True)
+```
+
+The adapter preserves `x`, dtype, dimension, integer graph labels, isolated nodes and explicit training selection. It accepts exactly one reciprocal COO entry per direction for each simple undirected edge. Extra fields such as `edge_attr`, `pos`, `batch` and weights, missing features, self-loops, parallel edges and mixed precision are rejected. It does not load uploaded pickles or infer replacement features. `dataset_from_pyg` returns the same `Dataset` used by the CLI; use `dataset_object` to export its represented inputs.
+
+## Release validation
+
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+npm --prefix frontend test
+npm --prefix frontend run build
+```
+
+Service/test dependencies are locked in `requirements-test.lock`; frontend versions and transitive resolution are in `frontend/package-lock.json`. Optional ML dependencies stay out of the serving image. Linux CI additionally runs real desktop/mobile browser workflows, wheel/CLI checks and a Docker HTTP smoke test. See [VERIFICATION.md](VERIFICATION.md) for observed results and [docs/performance.json](docs/performance.json) for measured synthetic probes; these are not production p95 or real-data ML benchmarks.
 
 ## Run from this directory
 

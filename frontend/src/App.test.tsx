@@ -77,6 +77,13 @@ test("demo sends original JSON text and only completed jobs expose verified resu
   expect(
     screen.getByRole("link", { name: "Certificate JSON ↓" }),
   ).toHaveAttribute("href", "/api/jobs/opaque/report");
+  fireEvent.change(screen.getByLabelText("Original dataset JSON"), {
+    target: { value: '{"changed":true}' },
+  });
+  expect(screen.queryByText("80%")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "Certificate JSON ↓" }),
+  ).not.toBeInTheDocument();
 });
 
 test("rejected audit shows field error and no ceiling or downloads", async () => {

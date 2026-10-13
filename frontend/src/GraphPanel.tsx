@@ -68,7 +68,10 @@ export default function GraphPanel({
     const components = cy.elements().components();
     const cols = Math.max(1, Math.ceil(Math.sqrt(components.length)));
     components.forEach((component, c) => {
-      const nodes = component.nodes();
+      const nodes = component
+        .nodes()
+        .toArray()
+        .sort((a, b) => a.data("index") - b.data("index"));
       nodes.forEach((node, i) => {
         const theta =
           (2 * Math.PI * i) / Math.max(1, nodes.length) - Math.PI / 2;

@@ -213,6 +213,7 @@ export default function App() {
           <label>
             Original dataset JSON
             <textarea
+              aria-label="Original dataset JSON"
               value={text}
               onChange={(e) => {
                 setText(e.target.value);

@@ -4,10 +4,6 @@ test("demo, refinement inspection and exact export", async ({ page }) => {
   await page.getByRole("button", { name: "Load demo" }).click();
   await page.getByRole("button", { name: "Run exact audit" }).click();
   await expect(page.getByText("80%", { exact: true })).toBeVisible();
-  await page.screenshot({
-    path: `test-results/audit-${test.info().project.name}.png`,
-    fullPage: true,
-  });
   await expect(
     page.getByRole("combobox", { name: "Graph A", exact: true }),
   ).toHaveValue("cycle-6");
@@ -19,7 +15,13 @@ test("demo, refinement inspection and exact export", async ({ page }) => {
   await page
     .getByRole("combobox", { name: "Inspect a node in Graph A" })
     .selectOption("0");
-  await expect(page.getByText("Actual features")).toBeVisible();
+  await expect(
+    page.getByText("Actual features [1]", { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: `test-results/audit-${test.info().project.name}.png`,
+    fullPage: true,
+  });
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("link", { name: "Certificate JSON ↓" }).click();
   const download = await downloadPromise;
