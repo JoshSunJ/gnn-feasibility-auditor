@@ -1,0 +1,199 @@
+{
+  "base_url": "https://gnn-feasibility-auditor.onrender.com",
+  "observations": [
+    {
+      "name": "compact-demo",
+      "at": "2026-10-13T04:14:53.285215+00:00",
+      "status": "completed",
+      "seconds": 4.478252701461315,
+      "sampled_peak_mb": 29.52,
+      "error": null,
+      "summary": {
+        "graph_count": 5,
+        "node_count": 30,
+        "class_count": 3,
+        "training_accuracy_upper_bound": {
+          "max_correct": 4,
+          "total": 5,
+          "fraction": "4/5",
+          "value": 0.8
+        },
+        "unavoidable_training_errors": 1,
+        "conflicting_pair_count": 2,
+        "certificate_verified": true,
+        "engine": "partition"
+      },
+      "independent_local_replay": true
+    },
+    {
+      "name": "duplicate-key-rejection",
+      "at": "2026-10-13T04:14:58.773564+00:00",
+      "status": "rejected",
+      "seconds": 4.816598491743207,
+      "sampled_peak_mb": 29.31,
+      "error": {
+        "code": "invalid_input",
+        "message": "duplicate JSON key 'graphs'"
+      },
+      "summary": null,
+      "no_partial_result": true
+    },
+    {
+      "name": "https-and-request-contract",
+      "at": "2026-10-13T04:14:58.924638+00:00",
+      "passed": true
+    },
+    {
+      "name": "PROTEINS",
+      "at": "2026-10-13T04:44:15.309249+00:00",
+      "status": "timed_out",
+      "seconds": 20.012414811179042,
+      "sampled_peak_mb": 102.1,
+      "error": {
+        "code": "timeout",
+        "message": "Audit time budget exceeded. No ceiling was certified."
+      },
+      "summary": null,
+      "no_partial_result": true
+    },
+    {
+      "name": "ENZYMES",
+      "at": "2026-10-13T04:44:38.407079+00:00",
+      "status": "timed_out",
+      "seconds": 20.00121547561139,
+      "sampled_peak_mb": 100.62,
+      "error": {
+        "code": "timeout",
+        "message": "Audit time budget exceeded. No ceiling was certified."
+      },
+      "summary": null,
+      "no_partial_result": true
+    },
+    {
+      "name": "synthetic-path-50000",
+      "at": "2026-10-13T04:45:01.397272+00:00",
+      "status": "timed_out",
+      "seconds": 20.001614634878933,
+      "sampled_peak_mb": 107.62,
+      "error": {
+        "code": "timeout",
+        "message": "Audit time budget exceeded. No ceiling was certified."
+      },
+      "summary": null,
+      "no_partial_result": true
+    },
+    {
+      "name": "restart-invalidates-old-capabilities",
+      "at": "2026-10-13T04:47:18.601395+00:00",
+      "passed": true,
+      "old_jobs": 5
+    },
+    {
+      "name": "PROTEINS",
+      "at": "2026-10-13T04:49:17.483184+00:00",
+      "status": "completed",
+      "seconds": 43.80285441316664,
+      "sampled_peak_mb": 192.7,
+      "error": null,
+      "summary": {
+        "graph_count": 890,
+        "node_count": 34099,
+        "class_count": 888,
+        "training_accuracy_upper_bound": {
+          "max_correct": 890,
+          "total": 890,
+          "fraction": "1",
+          "value": 1.0
+        },
+        "unavoidable_training_errors": 0,
+        "conflicting_pair_count": 0,
+        "certificate_verified": true,
+        "engine": "partition"
+      },
+      "independent_local_replay": true
+    },
+    {
+      "name": "ENZYMES",
+      "at": "2026-10-13T04:49:47.009494+00:00",
+      "status": "completed",
+      "seconds": 25.50411899574101,
+      "sampled_peak_mb": 137.55,
+      "error": null,
+      "summary": {
+        "graph_count": 480,
+        "node_count": 15480,
+        "class_count": 480,
+        "training_accuracy_upper_bound": {
+          "max_correct": 480,
+          "total": 480,
+          "fraction": "1",
+          "value": 1.0
+        },
+        "unavoidable_training_errors": 0,
+        "conflicting_pair_count": 0,
+        "certificate_verified": true,
+        "engine": "partition"
+      },
+      "independent_local_replay": true
+    },
+    {
+      "name": "synthetic-path-50000",
+      "at": "2026-10-13T04:50:20.565580+00:00",
+      "status": "completed",
+      "seconds": 29.202277855947614,
+      "sampled_peak_mb": 170.21,
+      "error": null,
+      "summary": {
+        "graph_count": 1,
+        "node_count": 50000,
+        "class_count": 1,
+        "training_accuracy_upper_bound": {
+          "max_correct": 1,
+          "total": 1,
+          "fraction": "1",
+          "value": 1.0
+        },
+        "unavoidable_training_errors": 0,
+        "conflicting_pair_count": 0,
+        "certificate_verified": true,
+        "engine": "partition"
+      },
+      "independent_local_replay": true
+    },
+    {
+      "name": "queue-overload-and-cancel",
+      "at": "2026-10-13T04:51:57.684127+00:00",
+      "passed": true,
+      "cancelled": 4,
+      "partial_artifacts": false
+    },
+    {
+      "name": "natural-retention-expiry",
+      "date_utc": "2026-10-13",
+      "passed": true,
+      "ttl_seconds": 900,
+      "expired_jobs": 2,
+      "evidence": "Earlier completed/rejected hosted jobs returned 404 for status and report after their recorded 15-minute deadline, before the runtime-budget redeployment."
+    }
+  ],
+  "kind": "hosted_release_checks",
+  "tested_commit": "49bf443eb6b5d1ad4a84fac8531b0655b34c5969",
+  "tested_version": "0.3.0",
+  "host": {
+    "provider": "Render",
+    "compute": "Free",
+    "cpu": 0.1,
+    "ram_mb": 512,
+    "region": "Oregon (US West)",
+    "auto_deploy": "off"
+  },
+  "final_runtime": {
+    "worker_timeout_seconds": 90,
+    "memory_mb": 256,
+    "ttl_seconds": 900,
+    "max_nodes": 50000,
+    "max_active": 1,
+    "max_queued": 3
+  },
+  "interpretation": "Single hosted observations, not production p95 or throughput. Every completed report was downloaded over HTTPS and independently replayed locally. Failed and cancelled jobs exposed no ceiling or partial artifact. These are input audits; no real-data model training or held-out accuracy is claimed. Embedded-browser native download completion was not reported; actual HTTPS report bytes were verified separately."
+}

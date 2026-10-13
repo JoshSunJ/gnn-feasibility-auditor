@@ -13,6 +13,6 @@ services:
       - key: AUDITOR_MEMORY_MB
         value: "256"
       - key: AUDITOR_TIMEOUT_SECONDS
-        value: "20"
+        value: "90"
       - key: AUDITOR_TTL_SECONDS
         value: "900"
