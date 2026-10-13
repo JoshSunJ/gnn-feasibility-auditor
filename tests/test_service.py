@@ -71,6 +71,68 @@ class ServiceTests(unittest.TestCase):
             self.assertIn("https://cdn.jsdelivr.net", client.get("/docs").headers["content-security-policy"])
             self.assertNotIn("https://cdn.jsdelivr.net", client.get("/api/config").headers["content-security-policy"])
 
+    def test_compact_mode_replays_and_exposes_final_inspection_without_fake_rounds(self):
+        with TestClient(create_app()) as client:
+            response = client.post("/api/jobs?mode=partition", content=RAW, headers={"Content-Type": "application/json"})
+            self.assertEqual(response.status_code, 202)
+            job_id = response.json()["id"]
+            job = wait_job(client, job_id)
+            self.assertEqual(job["status"], "completed", job)
+            self.assertEqual(job["summary"]["engine"], "partition")
+            self.assertEqual(job["summary"]["training_accuracy_upper_bound"]["fraction"], "4/5")
+            report = client.get(f"/api/jobs/{job_id}/report").json()
+            verify_report(loads_dataset(RAW), report)
+            self.assertEqual(report["certificate"]["version"], 2)
+            self.assertNotIn("rounds", report["certificate"])
+            view = client.get(f"/api/jobs/{job_id}/view").json()
+            self.assertEqual(view["inspection"]["mode"], "stable_only")
+            self.assertEqual(len(view["inspection"]["rounds"]), 1)
+            self.assertIn('"stable_only"', client.get(f"/api/jobs/{job_id}/explorer").text)
+            self.assertEqual(client.post("/api/jobs?mode=guessed", content=RAW, headers={"Content-Type": "application/json"}).status_code, 422)
+
+    def test_auto_compact_large_input_and_explicit_trace_budget(self):
+        n = 1200
+        value = json.loads(RAW)
+        value["graphs"] = [{"id": "long-path", "label": 0, "nodes": [{"id": str(i), "features": [1]} for i in range(n)],
+                             "edges": [[str(i), str(i + 1)] for i in range(n - 1)]}]
+        raw = json.dumps(value)
+        with TestClient(create_app()) as client:
+            job_id = self.submit(client, raw)
+            job = wait_job(client, job_id)
+            self.assertEqual(job["status"], "completed", job)
+            self.assertEqual(job["summary"]["node_count"], n)
+            self.assertEqual(job["summary"]["engine"], "partition")
+            verify_report(loads_dataset(raw), client.get(f"/api/jobs/{job_id}/report").json())
+            response = client.post("/api/jobs?mode=trace", content=raw, headers={"Content-Type": "application/json"})
+            traced = wait_job(client, response.json()["id"])
+            self.assertEqual(traced["status"], "rejected", traced)
+            self.assertIsNone(traced["summary"])
+            self.assertEqual(client.get(f"/api/jobs/{traced['id']}/report").status_code, 409)
+
+    def test_compact_evidence_budget_never_publishes_partial_result(self):
+        with TestClient(create_app(Limits(max_moved_vertices=1))) as client:
+            response = client.post("/api/jobs?mode=partition", content=RAW, headers={"Content-Type": "application/json"})
+            job = wait_job(client, response.json()["id"])
+            self.assertEqual(job["status"], "rejected", job)
+            self.assertIsNone(job["summary"])
+            self.assertEqual(client.get(f"/api/jobs/{job['id']}/report").status_code, 409)
+
+    def test_open_download_survives_expiry_but_new_requests_do_not(self):
+        manager = JobManager(Limits(ttl_seconds=.1))
+        try:
+            job = manager.submit(RAW, "partition")
+            while job["status"] in {"queued", "running"}:
+                time.sleep(.01)
+                job = manager.get(job["id"])
+            self.assertEqual(job["status"], "completed", job)
+            with manager.open_artifact(job["id"], "report") as stream:
+                time.sleep(.15)
+                with self.assertRaises(KeyError):
+                    manager.open_artifact(job["id"], "report")
+                verify_report(loads_dataset(RAW), json.load(stream))
+        finally:
+            manager.close()
+
     def test_duplicate_keys_and_unsupported_inputs_rejected_without_artifact(self):
         with TestClient(create_app()) as client:
             for raw in ('{"graphs":[],"graphs":[]}', RAW.replace('"simple_undirected"', '"directed"')):

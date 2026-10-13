@@ -1,5 +1,20 @@
 # SWE release tracker
 
+## v0.3 scale and live-release follow-up
+
+Branch: `feature/scale-and-live-release`. Hosting is authorized by the user; account access is still required. The private repository stays private.
+
+| Step | Evidence | State |
+|---|---|---|
+| Research and compact exact engine | SCALE_RESEARCH.md; 5,265 independent oracle pairs; separate justified-split replay, tamper and stability checks | Complete locally |
+| Actual-feature studies | PROTEINS/ENZYMES fixed training selections: 1,370 graphs, 49,579 nodes; both 100% ceilings honestly recorded | Complete |
+| Larger bounded service | 50,000-node synthetic paths/cycles/unique features and both real inputs completed in three local repetitions; streamed exports, bounded upload buffers | Complete locally; Linux/hosted checks pending |
+| Usable large-data inspection | Mode choice, final-only compact view, conflict/ID filtering, class/color pagination and full node-ID search | 8 component tests and build passed; browser checks pending |
+| Review and Linux packaging | Focused commits, PR, installed CLI + browser + 50k-node Linux Docker smoke | Pending CI |
+| Live deployment | Free/manual Render Blueprint; full service, no screenshot substitute | Blocked on installing/connecting Render and private-repository access; no deployment claimed |
+
+The v0.2 release record below is historical. Real input audits now exist; real-data model training remains future work.
+
 Work started 2026-10-12. The verified prototype is preserved on `main`; implementation proceeds on `feature/swe-release` with focused commits. Public hosting remains gated by validation.
 
 | Step | Acceptance criterion | Status |

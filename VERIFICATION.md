@@ -1,5 +1,17 @@
 # Verification record
 
+## Current compact-engine extension (v0.3, 2026-10-12)
+
+Research/design was recorded first in SCALE_RESEARCH.md. The compact producer agrees with the independent pairwise oracle on all 5,265 existing pairs. Its separate verifier reconstructs the actual-feature partition, replays only forced count-group splits and checks final equitability; it does not call the producer. Tampering, omitted/duplicate groups, early stops and arbitrary individualization fail. Full synchronous trace mode remains available.
+
+Local combined environment: **51 Python tests passed without skips**, including compact proof/export checks and 14 service tests. **Eight frontend tests** and the TypeScript/Vite production build passed. New checks cover mode selection, actual opposing labels, class filtering/pagination, bounded node search/histogram rendering and large-integer label preservation. CI for this extension is pending; the historical v0.2 Linux results below do not establish v0.3 Linux or hosted success.
+
+Real training-input audits: PROTEINS (890 graphs, 34,099 nodes, 4 actual float32 features) and ENZYMES (480 graphs, 15,480 nodes, 21 features). Both independently replayed and returned 100% ceilings with zero forced errors. No held-out inputs were audited. These studies preserve the recorded PyG loader's continuous attributes, one-hot supplied node labels and topology; default loader removal/coalescing is recorded before model consumption. Aggregate results, selection indices, loader settings and source-file digests are in docs/real-data-study.json. Digests are provenance only, never equivalence proof. No real-data model training was performed.
+
+Isolated service measurements: three repetitions each on 512/6,000/50,000-node paths, 50,000-node cycles, 50,000-node uniquely featured paths and both real inputs. All compact jobs completed, including independent replay and four artifacts. Larger completed medians were 1.15–3.00 seconds; maximum sampled worker RSS was 210.28 MiB. Explicit full trace on a 1,024-node path was rejected at the trace budget, with no ceiling. See docs/scale-service-performance.json. The original exporter initially exceeded memory on the 50,000-node path; duplicate viewer evidence and pretty-printed copies were removed before the saved final measurements. RSS is sampled; these macOS measurements are not production p95, throughput or target-host capacity evidence.
+
+Public service state: **not deployed**. Render was discovered and suggested but its integration is not yet installed/connected. The Free/manual Blueprint is prepared; no paid resources or public repository change have been made. Hosted HTTPS, expiry/restart and complete workflow checks still require access. Deployment remains an open step, not a claimed achievement.
+
 Core acceptance gate passed on 2026-10-10, before implementing model benchmarks or the visual interface.
 
 - Python 3.14.7; dependency-free standard-library test runner.

@@ -8,19 +8,26 @@ export default function GraphPanel({
   title,
   graphIndex,
   round,
+  stableOnly = false,
 }: {
   graph: Graph;
   label: string;
   title: string;
   graphIndex: number;
   round: Round;
+  stableOnly?: boolean;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<number | null>(null);
+  const [query, setQuery] = useState("");
+  const [histPage, setHistPage] = useState(0);
   const colors = round.node_colors[graphIndex];
   useEffect(() => {
     setSelected(null);
+    setQuery("");
+    setHistPage(0);
   }, [graph.id]);
+  useEffect(() => setHistPage(0), [round]);
   useEffect(() => {
     if (!container.current || graph.nodes.length > 500) return;
     const index = new Map(graph.nodes.map((node, i) => [node.id, i]));
@@ -99,6 +106,12 @@ export default function GraphPanel({
   }, [graph, colors]);
   const node = selected === null ? null : graph.nodes[selected];
   const histogram = round.histograms[graphIndex];
+  const matchingNodes = graph.nodes.flatMap((node, i) =>
+    node.id.toLowerCase().includes(query.toLowerCase()) ? [i] : [],
+  );
+  const shownNodes = matchingNodes.slice(0, 200);
+  if (selected !== null && !shownNodes.includes(selected))
+    shownNodes.unshift(selected);
   return (
     <article className="graph-panel">
       <div className="graph-meta">
@@ -118,17 +131,56 @@ export default function GraphPanel({
           ref={container}
           className="graph-canvas"
           role="img"
-          aria-label={`${title} topology and round ${round.round} colors`}
+          aria-label={`${title} topology and ${stableOnly ? "stable" : `round ${round.round}`} colors`}
         />
       )}
       {!graph.nodes.length && <p>This graph has no nodes.</p>}
       <div className="histogram" aria-label={`${title} exact color counts`}>
-        {histogram.map(([color, count]) => (
-          <span key={color}>
-            c{color} × {count}
-          </span>
-        ))}
+        {histogram
+          .slice(histPage * 100, (histPage + 1) * 100)
+          .map(([color, count]) => (
+            <span key={color}>
+              c{color} × {count}
+            </span>
+          ))}
       </div>
+      {histogram.length > 100 && (
+        <div className="hist-pages">
+          <small>
+            {histogram.length} exact colors · page {histPage + 1}/
+            {Math.ceil(histogram.length / 100)}
+          </small>
+          <button
+            className="secondary"
+            disabled={histPage === 0}
+            onClick={() => setHistPage(histPage - 1)}
+          >
+            Previous colors in {title}
+          </button>
+          <button
+            className="secondary"
+            disabled={(histPage + 1) * 100 >= histogram.length}
+            onClick={() => setHistPage(histPage + 1)}
+          >
+            Next colors in {title}
+          </button>
+        </div>
+      )}
+      {graph.nodes.length > 200 && (
+        <label className="node-search">
+          Find a node in {title}
+          <input
+            aria-label={`Find a node in ${title}`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Node ID"
+          />
+          <small>
+            {matchingNodes.length} matches; showing up to 200 and the selected
+            node.
+          </small>
+        </label>
+      )}
       <label className="node-label">
         Inspect a node in {title}
         <select
@@ -139,9 +191,9 @@ export default function GraphPanel({
           }
         >
           <option value="">Select a node or click the graph</option>
-          {graph.nodes.map((n, i) => (
-            <option key={n.id} value={i}>
-              {n.id}
+          {shownNodes.map((i) => (
+            <option key={graph.nodes[i].id} value={i}>
+              {graph.nodes[i].id}
             </option>
           ))}
         </select>
@@ -153,7 +205,13 @@ export default function GraphPanel({
             Actual features <code>{JSON.stringify(node.features)}</code>
           </p>
           <p>Color c{colors[selected]}</p>
-          <p>Exact refinement signature</p>
+          <p>
+            {stableOnly
+              ? "Stable signature [color, neighbor color counts]"
+              : round.round === 0
+                ? "Exact initial feature signature"
+                : "Exact refinement signature [old color, neighbor color counts]"}
+          </p>
           <code className="signature">
             {JSON.stringify(round.palette[colors[selected]])}
           </code>

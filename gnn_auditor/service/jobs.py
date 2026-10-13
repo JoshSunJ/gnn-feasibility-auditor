@@ -38,6 +38,7 @@ class Job:
     connection: Any = None
     peak_bytes: int = 0
     duration: float = 0
+    mode: str = "auto"
 
 
 class JobManager:
@@ -52,16 +53,23 @@ class JobManager:
         self.thread = threading.Thread(target=self._supervise, name="audit-supervisor", daemon=True)
         self.thread.start()
 
-    def submit(self, raw: str) -> dict:
+    def can_submit(self):
         with self.lock:
             self._expire()
             admitted = sum(j.status in {"queued", "running"} for j in self.jobs.values())
-            if self.closed.is_set() or admitted >= self.limits.max_active + self.limits.max_queued or len(self.jobs) >= self.limits.max_retained:
+            return not self.closed.is_set() and admitted < self.limits.max_active + self.limits.max_queued and len(self.jobs) < self.limits.max_retained
+
+    def submit(self, raw: str, mode: str = "auto") -> dict:
+        if mode not in {"auto", "trace", "partition"}:
+            raise ValueError("unsupported audit mode")
+        with self.lock:
+            self._expire()
+            if not self.can_submit():
                 raise CapacityError("Audit capacity is full. Download existing results or retry after temporary jobs expire.")
             job_id = secrets.token_urlsafe(32)
             directory = Path(self.root.name, job_id)
             directory.mkdir(mode=0o700)
-            job = Job(job_id, raw, directory)
+            job = Job(job_id, raw, directory, mode=mode)
             self.jobs[job_id] = job
             return self._view(job)
 
@@ -79,12 +87,16 @@ class JobManager:
             return self._view(job)
 
     def artifact(self, job_id: str, name: str) -> bytes:
+        with self.open_artifact(job_id, name) as stream:
+            return stream.read()
+
+    def open_artifact(self, job_id: str, name: str):
         with self.lock:
             self._expire()
             job = self.jobs[job_id]
             if job.status != "completed":
                 raise ValueError("Artifacts are available only after a completed, independently verified audit.")
-            return Path(job.directory, {"report": "report.json", "inputs": "inputs.json", "explorer": "explorer.html", "view": "view.json"}[name]).read_bytes()
+            return Path(job.directory, {"report": "report.json", "inputs": "inputs.json", "explorer": "explorer.html", "view": "view.json"}[name]).open("rb")
 
     def health(self):
         with self.lock:
@@ -154,7 +166,7 @@ class JobManager:
                         event = job.connection.recv()
                         kind = event["kind"]
                         if kind == "progress":
-                            job.progress = {"round": event["round"], "color_count": event["color_count"]}
+                            job.progress = {"round": event.get("round"), "step": event.get("step"), "color_count": event["color_count"]}
                         elif kind == "completed":
                             if not all((job.directory / name).is_file() for name in ("report.json", "inputs.json", "explorer.html", "view.json")):
                                 raise ValueError("missing verified artifacts")
@@ -176,7 +188,7 @@ class JobManager:
                     continue
                 parent, child = self.context.Pipe(duplex=False)
                 job.connection = parent
-                job.process = self.context.Process(target=self.worker, args=(job.raw, str(job.directory), self.limits, child), daemon=True)
+                job.process = self.context.Process(target=self.worker, args=({"raw": job.raw, "mode": job.mode}, str(job.directory), self.limits, child), daemon=True)
                 try:
                     job.started = time.monotonic()
                     job.process.start()

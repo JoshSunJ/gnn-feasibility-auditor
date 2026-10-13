@@ -2,7 +2,7 @@ services:
   - type: web
     name: gnn-feasibility-auditor
     runtime: docker
-    plan: starter
+    plan: free
     healthCheckPath: /api/health
     autoDeployTrigger: off
     envVars:

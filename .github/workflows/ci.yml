@@ -25,6 +25,9 @@ jobs:
           cd /tmp
           gnn-audit audit "$GITHUB_WORKSPACE/examples/conflicts.json" --format json --certificate --output audit.json
           gnn-audit verify "$GITHUB_WORKSPACE/examples/conflicts.json" audit.json
+          gnn-audit audit "$GITHUB_WORKSPACE/examples/conflicts.json" --engine partition --format json --certificate --output compact.json
+          gnn-audit verify "$GITHUB_WORKSPACE/examples/conflicts.json" compact.json
+          gnn-audit explore "$GITHUB_WORKSPACE/examples/conflicts.json" --engine partition --output compact.html
   service-and-browser:
     runs-on: ubuntu-latest
     steps:

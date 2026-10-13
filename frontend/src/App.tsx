@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { request } from "./api";
 import { isActive, percent, type Config, type Job, type View } from "./types";
+import StudyEvidence from "./StudyEvidence";
 
 const Comparison = lazy(() => import("./Comparison"));
 
@@ -12,6 +13,7 @@ export default function App() {
   const [view, setView] = useState<View | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [mode, setMode] = useState<"auto" | "trace" | "partition">("auto");
   const file = useRef<HTMLInputElement>(null);
   const active = isActive(job);
   useEffect(() => {
@@ -105,11 +107,14 @@ export default function App() {
     setBusy(true);
     try {
       setJob(
-        await request<Job>("/api/jobs", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: text,
-        }),
+        await request<Job>(
+          mode === "auto" ? "/api/jobs" : `/api/jobs?mode=${mode}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: text,
+          },
+        ),
       );
     } catch (e) {
       setError((e as Error).message);
@@ -132,7 +137,7 @@ export default function App() {
         <a className="brand" href="/">
           ◈ <span>GNN Auditor</span>
         </a>
-        <span className="version">Exact 1-WL · v0.2</span>
+        <span className="version">Exact 1-WL · v0.3</span>
         <a href="/docs" target="_blank" rel="noreferrer">
           API reference ↗
         </a>
@@ -245,6 +250,29 @@ export default function App() {
             inputs. Node IDs and display positions are bookkeeping.
           </p>
         </details>
+        <label className="mode-control">
+          Audit mode
+          <select
+            value={mode}
+            disabled={active || busy}
+            onChange={(e) => {
+              setMode(e.target.value as typeof mode);
+              setJob(null);
+              setView(null);
+            }}
+          >
+            <option value="auto">
+              Automatic — round trace for small inputs, compact for larger
+              inputs
+            </option>
+            <option value="trace">
+              Full round trace — teaching and step inspection
+            </option>
+            <option value="partition">
+              Compact certificate — larger or long-refining graphs
+            </option>
+          </select>
+        </label>
         <div className="run-row">
           <button
             className="primary"
@@ -282,8 +310,10 @@ export default function App() {
             </p>
             {job.progress && (
               <span>
-                Round {job.progress.round} · {job.progress.color_count} exact
-                colors
+                {job.progress.round === null
+                  ? `Splitters checked ${job.progress.step}`
+                  : `Round ${job.progress.round}`}{" "}
+                · {job.progress.color_count} exact colors
               </span>
             )}
             {active && (
@@ -319,7 +349,10 @@ export default function App() {
           <div className="exports">
             <span>
               Verified in {job!.runtime_seconds.toFixed(2)}s · sampled peak{" "}
-              {job!.peak_memory_mb} MiB
+              {job!.peak_memory_mb} MiB ·{" "}
+              {summary.engine === "partition"
+                ? "compact split certificate"
+                : "full round trace"}
             </span>
             <div>
               <a href={`/api/jobs/${job!.id}/report`}>Certificate JSON ↓</a>
@@ -350,6 +383,7 @@ export default function App() {
           </p>
         </>
       )}
+      <StudyEvidence />
       <footer>
         <strong>Training-set representational limit.</strong> This ceiling does
         not predict test accuracy. A 100% ceiling means no forced label conflict

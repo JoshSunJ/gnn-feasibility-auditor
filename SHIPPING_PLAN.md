@@ -1,5 +1,7 @@
 # Product direction and shipping decision
 
+Current follow-up, 2026-10-12: v0.3 adds the exact compact engine and independent split verifier, actual-feature PROTEINS/ENZYMES training-input studies, measured 50,000-node service probes and large-data inspection. The user has authorized live deployment. Remaining gates are the current extension's Linux/browser CI, installation/connection of Render with private-repository access, and actual hosted checks. render.yaml now defaults to Free/manual deployment; paid hosting and making the repository public remain separate decisions. The original plan below is historical; refer to RELEASE_CHECKLIST.md and VERIFICATION.md for current status.
+
 Update on 2026-10-12: the SWE release branch now implements the upload/API workflow, React/TypeScript/Cytoscape interface, bounded jobs, optional PyG adapter, failure tests and delivery configuration. See RELEASE_CHECKLIST.md, OPERATIONS.md and VERIFICATION.md for current evidence. The original plan below is retained as design context; its missing-work table describes the initial prototype, not the current implementation. Real-data studies and hosted staging remain outstanding.
 
 Decision on 2026-10-10: **hold public deployment**. The exact auditing core is verified and usable locally. The application is a report prototype, not yet a public upload-and-audit service. The corrected root `index.html` is the intended local entry point.

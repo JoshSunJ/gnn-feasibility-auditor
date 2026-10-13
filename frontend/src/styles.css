@@ -449,6 +449,70 @@ select {
 .node-label {
   font-size: 11px;
 }
+.mode-control,
+.class-search,
+.node-search {
+  display: block;
+  margin-top: 16px;
+}
+.class-search input,
+.node-search input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px;
+  border: 1px solid #d4ddd0;
+  border-radius: 6px;
+  min-width: 0;
+}
+.node-search small {
+  display: block;
+  margin-top: 4px;
+}
+.class-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.class-pages,
+.hist-pages {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.classes > small,
+.hist-pages small {
+  font-size: 11px;
+  color: #64756d;
+}
+.hist-pages small {
+  width: 100%;
+}
+.hist-pages button {
+  padding: 5px 8px;
+  font-size: 10px;
+}
+.study-evidence {
+  padding: 18px 22px;
+  margin-top: 32px;
+}
+.study-evidence p {
+  font-size: 12px;
+  color: #64756d;
+}
+.study-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.study-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+}
 .node-detail {
   background: #f4f7f0;
   padding: 12px;
@@ -530,6 +594,11 @@ footer {
     grid-column: 1/-1;
     margin: 0;
   }
+  .classes > label,
+  .classes > small,
+  .classes > .class-pages {
+    grid-column: 1/-1;
+  }
   .class-card {
     padding: 12px;
     margin: 0;
@@ -562,6 +631,9 @@ footer {
   }
   .upload-row,
   .graph-grid {
+    grid-template-columns: 1fr;
+  }
+  .study-grid {
     grid-template-columns: 1fr;
   }
   .results {

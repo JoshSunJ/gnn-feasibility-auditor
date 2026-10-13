@@ -12,13 +12,14 @@ class BudgetExceeded(ValueError):
 
 @dataclass(frozen=True)
 class Limits:
-    max_bytes: int = 1_048_576
-    max_graphs: int = 128
-    max_nodes: int = 2048
-    max_edges: int = 8192
+    max_bytes: int = 16_777_216
+    max_graphs: int = 2048
+    max_nodes: int = 50_000
+    max_edges: int = 200_000
     max_feature_dim: int = 64
     max_trace_cells: int = 131_072
-    max_output_bytes: int = 16_777_216
+    max_output_bytes: int = 67_108_864
+    max_moved_vertices: int = 500_000
     timeout_seconds: float = 20
     memory_mb: int = 256
     max_active: int = 1
