@@ -1,5 +1,13 @@
 # Verification record
 
+## Hosted release and metadata hardening (v0.3.1)
+
+The live Docker app is at https://gnn-feasibility-auditor.onrender.com on Render Free/Oregon, 0.1 CPU / 512 MiB instance RAM, manual deployment. [docs/hosted-verification.json](docs/hosted-verification.json) records actual checks at `49bf443`: HTTPS API/contract, downloaded independent proof replay, duplicate-key rejection and no partial results, timeout behavior, real 15-minute expiry, redeployment invalidation, queue overload and cancellation. No paid compute or public repository change was made.
+
+The initial 20-second budget timed out on PROTEINS, ENZYMES and the 50,000-node path, correctly publishing no ceiling. After measuring the Free instance, the runtime budget was bounded at 90 seconds. All three completed and their exported proofs independently replayed locally: PROTEINS 43.80s / sampled RSS 192.70 MiB; ENZYMES 25.50s / 137.55 MiB; path 29.20s / 170.21 MiB. These are individual observations, not p95 or throughput claims. The embedded browser displayed the verified demo, stable comparison and actual-feature inspection, but did not report its native download-completion event; actual HTTPS export bytes were verified separately. Linux CI's ordinary Chromium desktop/mobile workflows verify native downloads.
+
+Final source hardening rejects boolean/float aliases for integer report labels and non-integer label counts in both certificate versions. Python's cross-type equality previously accepted those changed metadata fields; valid producer results and the computed ceiling were unaffected. A regression test now rejects those cases. Near-perfect ceilings also cannot round into a misleading displayed 100%: 2047/2048 shows 99.95%, while the exact counts remain visible. Local validation: 52 Python tests without skips, nine frontend tests and the production build. Release CI and the final deployed commit are linked from the release PR/notes; hosted measurements above retain their exact original commit attribution.
+
 ## Current compact-engine extension (v0.3, 2026-10-12)
 
 Research/design was recorded first in SCALE_RESEARCH.md. The compact producer agrees with the independent pairwise oracle on all 5,265 existing pairs. Its separate verifier reconstructs the actual-feature partition, replays only forced count-group splits and checks final equitability; it does not call the producer. Tampering, omitted/duplicate groups, early stops and arbitrary individualization fail. Full synchronous trace mode remains available.
@@ -12,7 +20,7 @@ Real training-input audits: PROTEINS (890 graphs, 34,099 nodes, 4 actual float32
 
 Isolated service measurements: three repetitions each on 512/6,000/50,000-node paths, 50,000-node cycles, 50,000-node uniquely featured paths and both real inputs. All compact jobs completed, including independent replay and four artifacts. Larger completed medians were 1.15–3.00 seconds; maximum sampled worker RSS was 210.28 MiB. Explicit full trace on a 1,024-node path was rejected at the trace budget, with no ceiling. See docs/scale-service-performance.json. The original exporter initially exceeded memory on the 50,000-node path; duplicate viewer evidence and pretty-printed copies were removed before the saved final measurements. RSS is sampled; these macOS measurements are not production p95, throughput or target-host capacity evidence.
 
-Public service state: **not deployed**. Render was discovered and suggested but its integration is not yet installed/connected. The Free/manual Blueprint is prepared; no paid resources or public repository change have been made. Hosted HTTPS, expiry/restart and complete workflow checks still require access. Deployment remains an open step, not a claimed achievement.
+This extension's initial hosting state was not deployed. The hosted-release section above supersedes that state and preserves the checked commit/runtime distinctions.
 
 Core acceptance gate passed on 2026-10-10, before implementing model benchmarks or the visual interface.
 

@@ -4,7 +4,9 @@ A research-first auditing library and full-stack application for graph-level cla
 
 The core needs only Python 3.10+. The service uses Python 3.13, FastAPI and supervised worker processes; the interface uses React, TypeScript and Cytoscape.js. Benchmarks and the PyTorch Geometric adapter are optional. Independently verified reports can also be exported as self-contained offline HTML.
 
-Private project: [repository](https://github.com/JoshSunJ/gnn-feasibility-auditor), [release tracker](https://github.com/JoshSunJ/gnn-feasibility-auditor/issues/1), [release checks](https://github.com/JoshSunJ/gnn-feasibility-auditor/actions). Public hosting requires the hosting connection and hosted verification. Actual-feature training-input audits of PROTEINS and ENZYMES are recorded below; saved model fits use the synthetic correctness fixture.
+**[Open the hosted auditor](https://gnn-feasibility-auditor.onrender.com)** → Load demo or upload your training JSON → Run exact audit → inspect and export the evidence. The Free instance may take about a minute to wake after inactivity; larger audits can take tens of seconds. Results are temporary. This is a bounded portfolio tool, without an always-on production SLA.
+
+Private project: [repository](https://github.com/JoshSunJ/gnn-feasibility-auditor), [release tracker](https://github.com/JoshSunJ/gnn-feasibility-auditor/issues/1), [release checks](https://github.com/JoshSunJ/gnn-feasibility-auditor/actions). Actual-feature PROTEINS/ENZYMES input audits are recorded below; saved trained-model fits use the synthetic correctness fixture. [Hosted evidence](docs/hosted-verification.json) records completed large audits, proof replay, cancellation, overload, timeout, expiry and restart behavior.
 
 ![Verified audit and graph inspection](docs/screenshots/audit-desktop.png)
 
@@ -66,7 +68,7 @@ python scripts/real_data_study.py --root /tmp/gnn-tu-data
 .venv/bin/python scripts/measure_scale_service.py --root /tmp/gnn-tu-data
 ```
 
-Three-repetition local service probes completed on 50,000-node paths, cycles and uniquely featured paths, plus both real inputs. Median total times were about 1.15–3.00 seconds across those cases; maximum sampled worker RSS was 210.28 MiB. [Full observations](docs/scale-service-performance.json) include process startup, exact refinement, independent replay, all four artifacts and streamed reads. This is neither production p95 nor a throughput promise. Linux and hosted results are recorded separately in VERIFICATION.md.
+Three-repetition local service probes completed on 50,000-node paths, cycles and uniquely featured paths, plus both real inputs. Median total times were about 1.15–3.00 seconds across those cases; maximum sampled worker RSS was 210.28 MiB. [Full local observations](docs/scale-service-performance.json) include process startup, exact refinement, independent replay, all four artifacts and streamed reads. On the actual Free host, single completed observations were 43.80s for PROTEINS, 25.50s for ENZYMES and 29.20s for the 50,000-node path, with downloaded proofs independently replayed. The host uses a bounded 90-second worker budget after the original 20-second budget correctly timed out. These are neither production p95 nor throughput promises. Linux and hosted results are recorded separately in VERIFICATION.md.
 
 ## Optional PyTorch Geometric ingestion
 

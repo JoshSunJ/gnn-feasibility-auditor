@@ -77,5 +77,9 @@ export interface Config {
 }
 export const isActive = (job: Job | null) =>
   job?.status === "queued" || job?.status === "running";
-export const percent = (bound: Bound) =>
-  `${(bound.value * 100).toFixed(1).replace(/\.0$/, "")}%`;
+export const percent = (bound: Bound) => {
+  const displayed = Number((bound.value * 100).toFixed(2));
+  return displayed === 100 && bound.max_correct < bound.total
+    ? "<100%"
+    : `${displayed}%`;
+};

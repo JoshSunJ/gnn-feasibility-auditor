@@ -14,6 +14,22 @@ from test_core import graph, dataset, reference_pair
 
 
 class PartitionTests(unittest.TestCase):
+    def test_both_certificate_versions_reject_cross_type_label_metadata(self):
+        data = parse_dataset(dataset(graph("a", 1, [], 0), graph("b", 1, [], 1)))
+        for engine in (audit, audit_partition):
+            original = engine(data, include_certificate=True)
+            verify_report(data, original)
+            for field in ("label_counts", "majority_labels"):
+                for replacement in (False, 0.0):
+                    report = copy.deepcopy(original)
+                    report["classes"][0][field][0]["label"] = replacement
+                    with self.subTest(engine=engine.__name__, field=field, replacement=replacement), self.assertRaisesRegex(VerificationError, "label type"):
+                        verify_report(data, report)
+            report = copy.deepcopy(original)
+            report["classes"][0]["label_counts"][0]["count"] = True
+            with self.assertRaisesRegex(VerificationError, "count must be an integer"):
+                verify_report(data, report)
+
     def test_all_5265_oracle_pairs(self):
         small = []
         for n in range(5):

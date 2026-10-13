@@ -88,3 +88,39 @@ test("compact proof mode and class search work without presenting fake refinemen
     .selectOption("trace");
   await expect(page.getByText("80%", { exact: true })).toHaveCount(0);
 });
+
+test("a rare forced error stays below 100 percent in both online and offline reports", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const raw = JSON.stringify({
+    schema_version: 1,
+    split: "train",
+    graph_type: "simple_undirected",
+    feature_dtype: "float64",
+    feature_dim: 1,
+    graphs: Array.from({ length: 2048 }, (_, i) => ({
+      id: `sample-${i}`,
+      label: i === 2047 ? 1 : 0,
+      nodes: [{ id: "0", features: [1] }],
+      edges: [],
+    })),
+  });
+  await page
+    .getByText("Paste or inspect dataset JSON", { exact: true })
+    .click();
+  await page.getByLabel("Original dataset JSON").fill(raw);
+  await page.getByRole("button", { name: "Run exact audit" }).click();
+  await expect(page.getByText("99.95%", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("2047 of 2048 labels at most", { exact: true }),
+  ).toBeVisible();
+  const offline = await page
+    .getByRole("link", { name: "Offline report ↗" })
+    .getAttribute("href");
+  await page.goto(offline!);
+  await expect(page.getByText("99.95%", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("2047 of 2048 labels at most", { exact: true }),
+  ).toBeVisible();
+});

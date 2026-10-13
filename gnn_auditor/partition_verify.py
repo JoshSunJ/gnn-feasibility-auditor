@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 from fractions import Fraction
 
 from .data import feature_key, label_key
-from .verify import VerificationError
+from .verify import VerificationError, _check_class_label_types
 
 
 def require(condition, message):
@@ -139,6 +139,7 @@ def _replay(dataset, report):
         pairs = size * (size - 1) // 2
         cross = pairs - sum(n * (n - 1) // 2 for n in labels.values())
         require(tuple(tuple(x) for x in item["stable_histogram"]) == histogram, "wrong class histogram")
+        _check_class_label_types(item)
         require(item["label_counts"] == expected_counts and item["majority_labels"] == expected_majorities, "wrong class labels")
         require(item["size"] == size and item["max_correct"] == majority and item["unavoidable_errors"] == size - majority and item["conflicting_pair_count"] == cross, "wrong class arithmetic")
         correct += majority
