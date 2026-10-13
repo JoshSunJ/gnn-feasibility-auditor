@@ -1,0 +1,83 @@
+name: Verify release
+on:
+  push:
+    branches: [main, feature/swe-release]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      - run: |
+          python -m pip install .
+          cd /tmp
+          gnn-audit audit "$GITHUB_WORKSPACE/examples/conflicts.json" --format json --certificate --output audit.json
+          gnn-audit verify "$GITHUB_WORKSPACE/examples/conflicts.json" audit.json
+  service-and-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: python -m pip install -r requirements-test.lock
+      - run: python -m unittest discover -s tests -v
+      - run: npm ci
+        working-directory: frontend
+      - run: npm test
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: npm run test:browser
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: frontend/test-results
+  optional-ml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install torch-geometric
+      - run: python -m unittest discover -s tests -v
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t gnn-auditor:test .
+      - run: docker run -d --name auditor -p 8000:8000 gnn-auditor:test
+      - run: |
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/api/health; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8000/ > /tmp/index.html
+          python scripts/container_smoke.py
+      - run: docker logs auditor
+        if: failure()
+      - run: docker rm -f auditor
+        if: always()
