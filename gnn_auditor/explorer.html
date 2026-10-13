@@ -91,14 +91,14 @@
   const byId = new Map(graphs.map((g,i) => [g.id, {graph:g,index:i}]));
   const classFor = new Map(report.classes.flatMap(c => c.graph_ids.map(id => [id,c])));
   const $ = id => document.getElementById(id);
-  const percent = x => (100*x).toFixed(1).replace(/\.0$/, '')+'%';
+  const percent = (x,correct,total) => { const rounded=Number((100*x).toFixed(2)); return rounded===100&&correct<total?'<100%':rounded+'%'; };
   const labelText = g => payload.graph_label_text[g.id];
   const sameLabel = (a,b) => labelText(a) === labelText(b);
   const text = (id,value) => {$(id).textContent = value;};
   const color = c => `hsl(${(c*137.508+145)%360} 42% 75%)`;
   const bound = report.training_accuracy_upper_bound;
   text('dataset-description', dataset.description || 'Feature-aware training feasibility report');
-  text('ceiling',percent(bound.value)); text('ceiling-detail',`${bound.max_correct} of ${bound.total} labels at most`);
+  text('ceiling',percent(bound.value,bound.max_correct,bound.total)); text('ceiling-detail',`${bound.max_correct} of ${bound.total} labels at most`);
   text('errors',report.unavoidable_training_errors); text('sample-count',`${report.graph_count} training samples`);
   text('pairs',report.conflicting_pair_count); text('class-count',`${report.class_count} stable equivalence classes`);
   text('class-total',report.class_count);
@@ -213,7 +213,7 @@
     for(const run of benchmark.runs){
       const row=document.createElement('tr');
       const c=run.consistency,ok=!c.any_observed_accuracy_above_ceiling&&!c.classes_with_different_predictions.length&&!c.classes_exceeding_logit_tolerance.length;
-      const values=[run.model+' / '+run.seed,percent(run.final_train_accuracy),percent(run.best_observed_train_accuracy),percent(bound.value),c.max_within_class_logit_difference.toExponential(2),ok?'Consistent':'Inspect numerical diagnostics'];
+      const values=[run.model+' / '+run.seed,percent(run.final_train_accuracy,run.final_train_correct,bound.total),percent(run.best_observed_train_accuracy,run.best_observed_train_correct,bound.total),percent(bound.value,bound.max_correct,bound.total),c.max_within_class_logit_difference.toExponential(2),ok?'Consistent':'Inspect numerical diagnostics'];
       values.forEach((value,i)=>{const td=document.createElement('td');td.textContent=value;if(i>0&&i<5)td.className='num';row.append(td);});$('benchmark-body').append(row);
     }
   }

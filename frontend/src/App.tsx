@@ -21,7 +21,7 @@ export default function App() {
       .then(setConfig)
       .catch(() =>
         setError(
-          "The audit service is unavailable. Start the service, then reload this page.",
+          "The audit service is temporarily unavailable. Try reloading in a moment.",
         ),
       );
   }, []);
@@ -137,7 +137,7 @@ export default function App() {
         <a className="brand" href="/">
           ◈ <span>GNN Auditor</span>
         </a>
-        <span className="version">Exact 1-WL · v0.3</span>
+        <span className="version">Exact 1-WL · v0.3.1</span>
         <a href="/docs" target="_blank" rel="noreferrer">
           API reference ↗
         </a>

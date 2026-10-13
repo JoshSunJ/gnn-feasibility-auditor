@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gnn-feasibility-auditor"
-version = "0.3.0"
+version = "0.3.1"
 description = "Exact feature-aware 1-WL training feasibility audit"
 requires-python = ">=3.10"
 dependencies = []

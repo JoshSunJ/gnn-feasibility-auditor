@@ -47,7 +47,7 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
         yield
         app.state.jobs.close()
 
-    app = FastAPI(title="GNN Feasibility Auditor", version="0.3.0", lifespan=lifespan,
+    app = FastAPI(title="GNN Feasibility Auditor", version="0.3.1", lifespan=lifespan,
                   description="Exact actual-feature 1-WL auditing of supplied training graphs. Completed results are independently replayed; interrupted jobs have no certified ceiling.")
 
     @app.middleware("http")
@@ -70,7 +70,7 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
 
     @app.get("/api/config")
     def config():
-        return {"limits": limits.public(), "scope": "simple undirected training graphs with explicit numeric float32/float64 node features", "storage": "Temporary; results expire and are lost on service restart.", "version": "0.3.0"}
+        return {"limits": limits.public(), "scope": "simple undirected training graphs with explicit numeric float32/float64 node features", "storage": "Temporary; results expire and are lost on service restart.", "version": "0.3.1"}
 
     @app.get("/api/demo")
     def demo():

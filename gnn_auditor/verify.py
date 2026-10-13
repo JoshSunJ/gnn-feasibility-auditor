@@ -21,6 +21,17 @@ def _freeze(value: Any) -> Any:
     return tuple(_freeze(x) for x in value) if isinstance(value, (list, tuple)) else value
 
 
+def _check_class_label_types(item: dict) -> None:
+    # Python equates False with 0 and 0.0 with 0. Reports must preserve the
+    # declared label type rather than accepting that cross-type equality.
+    for field in ("label_counts", "majority_labels"):
+        for entry in item[field]:
+            label = entry["label"]
+            _check(type(label) in (str, int) and entry["label_type"] == label_key(label)[0], "class label type mismatch")
+            if field == "label_counts":
+                _check(type(entry["count"]) is int, "label count must be an integer")
+
+
 def verify_report(dataset: Dataset, report: dict) -> None:
     """Validate a report against the given actual inputs, or raise VerificationError."""
     if isinstance(report, dict) and report.get("report_version") == 2:
@@ -113,6 +124,7 @@ def _verify(dataset: Dataset, report: dict) -> None:
         pairs = size * (size - 1) // 2
         cross = pairs - sum(n * (n - 1) // 2 for n in counts.values())
         _check(_freeze(item["stable_histogram"]) == histogram, "class histogram mismatch")
+        _check_class_label_types(item)
         _check(item["label_counts"] == label_counts and item["majority_labels"] == majority_labels, "label counts/majorities mismatch")
         _check(item["size"] == size and item["max_correct"] == majority and item["unavoidable_errors"] == size - majority, "class bound mismatch")
         _check(item["conflicting_pair_count"] == cross, "class conflict count mismatch")
