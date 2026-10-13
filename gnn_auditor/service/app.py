@@ -116,12 +116,13 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
 
     @app.get("/api/jobs/{job_id}/{artifact}")
     def download(job_id: str, artifact: str):
-        if artifact not in {"report", "inputs", "explorer"}:
+        if artifact not in {"report", "inputs", "explorer", "view"}:
             raise HTTPException(404, "Unknown artifact.")
         content = lookup(app.state.jobs.artifact, job_id, artifact)
         if artifact == "explorer":
             return Response(content, media_type="text/html")
-        return Response(content, media_type="application/json", headers={"Content-Disposition": f'attachment; filename="{artifact}.json"'})
+        headers = {} if artifact == "view" else {"Content-Disposition": f'attachment; filename="{artifact}.json"'}
+        return Response(content, media_type="application/json", headers=headers)
 
     if frontend.is_dir():
         app.mount("/", StaticFiles(directory=frontend, html=True), name="frontend")

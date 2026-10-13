@@ -84,7 +84,7 @@ class JobManager:
             job = self.jobs[job_id]
             if job.status != "completed":
                 raise ValueError("Artifacts are available only after a completed, independently verified audit.")
-            return Path(job.directory, {"report": "report.json", "inputs": "inputs.json", "explorer": "explorer.html"}[name]).read_bytes()
+            return Path(job.directory, {"report": "report.json", "inputs": "inputs.json", "explorer": "explorer.html", "view": "view.json"}[name]).read_bytes()
 
     def health(self):
         with self.lock:
@@ -156,7 +156,7 @@ class JobManager:
                         if kind == "progress":
                             job.progress = {"round": event["round"], "color_count": event["color_count"]}
                         elif kind == "completed":
-                            if not all((job.directory / name).is_file() for name in ("report.json", "inputs.json", "explorer.html")):
+                            if not all((job.directory / name).is_file() for name in ("report.json", "inputs.json", "explorer.html", "view.json")):
                                 raise ValueError("missing verified artifacts")
                             job.summary = event["summary"]
                             self._finish(job, "completed")

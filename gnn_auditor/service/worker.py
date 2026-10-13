@@ -35,6 +35,9 @@ def run_audit(raw: str, directory: str, limits: Limits, connection):
             "report": ("report.json", json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2)),
             "inputs": ("inputs.json", json.dumps(dataset_object(dataset), ensure_ascii=False, allow_nan=False, indent=2)),
             "explorer": ("explorer.html", render_verified_html(dataset, report)),
+            "view": ("view.json", json.dumps({"dataset": dataset_object(dataset), "report": report,
+                "graph_label_text": {g.id: json.dumps(g.label, ensure_ascii=True) for g in dataset.graphs},
+                "class_label_text": {c["id"]: [json.dumps(x["label"], ensure_ascii=True) for x in c["label_counts"]] for c in report["classes"]}}, ensure_ascii=True, allow_nan=False)),
         }
         size = 0
         for filename, contents in artifacts.values():
