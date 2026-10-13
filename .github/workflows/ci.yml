@@ -1,7 +1,7 @@
 name: Verify release
 on:
   push:
-    branches: [main, feature/swe-release]
+    branches: [main]
   pull_request:
 permissions:
   contents: read

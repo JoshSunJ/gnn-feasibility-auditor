@@ -64,6 +64,13 @@ class ServiceTests(unittest.TestCase):
             self.assertEqual(job["summary"]["training_accuracy_upper_bound"]["fraction"], "4/5")
             self.assertGreater(job["runtime_seconds"], 0)
 
+    def test_api_reference_has_upload_contract_and_separate_viewer_policy(self):
+        with TestClient(create_app()) as client:
+            schema = client.get("/openapi.json").json()
+            self.assertIn("application/json", schema["paths"]["/api/jobs"]["post"]["requestBody"]["content"])
+            self.assertIn("https://cdn.jsdelivr.net", client.get("/docs").headers["content-security-policy"])
+            self.assertNotIn("https://cdn.jsdelivr.net", client.get("/api/config").headers["content-security-policy"])
+
     def test_duplicate_keys_and_unsupported_inputs_rejected_without_artifact(self):
         with TestClient(create_app()) as client:
             for raw in ('{"graphs":[],"graphs":[]}', RAW.replace('"simple_undirected"', '"directed"')):

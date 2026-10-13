@@ -54,6 +54,10 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+        if request.url.path in {"/docs", "/redoc"}:
+            # FastAPI's documentation viewers load their UI bundles from
+            # this CDN. Dataset/result pages retain the stricter same-origin policy.
+            response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
         return response
 
     @app.get("/api/health")
@@ -69,7 +73,8 @@ def create_app(limits: Limits | None = None, *, manager_factory=JobManager, fron
         # Packaged demo, no network dataset download or synthesized features.
         return FileResponse(Path(__file__).with_name("demo.json"), media_type="application/json")
 
-    @app.post("/api/jobs", status_code=202, response_model=JobView)
+    @app.post("/api/jobs", status_code=202, response_model=JobView,
+              openapi_extra={"requestBody": {"required": True, "content": {"application/json": {"schema": {"type": "object", "description": "Original training dataset JSON; the worker's strict loader validates the documented schema without coercing model inputs."}}}}})
     async def submit(request: Request):
         if request.headers.get("content-type", "").split(";", 1)[0].strip() != "application/json":
             raise HTTPException(415, "Send the original dataset JSON with Content-Type: application/json.")
